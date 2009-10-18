@@ -1,0 +1,29 @@
+QuoteSee 0.2.2 [2009-10-09] Jan Zegan <jzegan@gmail.com>
+* Fixed symbol case bug and altered size handling code
+* Increased width 25 pixels
+* Added identification of invalid symbols
+
+QuoteSee 0.2.1 [2009-08-27] Jan Zegan <jzegan@gmail.com>
+* Fixed crashing when running multiple instances
+* Reverted to KUrlRequester::setPath, for KDE 4.3 will return a deprecation warning but will work, will revert back when 4.3 is more common
+* Modified behavior for handling load/save file path
+
+QuoteSee 0.2 [2009-08-10] Jan Zegan <jzegan@gmail.com>
+New features:
+* Hovering over a widget causes a button for external link to show up, clicking on it opens a browser on yahoo page for the symbol
+* Hovering over a widget causes tool tip with trade time and date to show up
+* Configuration options for reading and saving a symbol list file
+* Configuration setting for increasing/decreasin update interval, this is for widget only, dataengine updates every 1 minute
+* Configuration setting for settning applet translucency
+* New Icon!!
+Changes:
+* Now plasmoid uses quotesee data engine
+* Improved processing for currency change fetching, grabs a smaller chunk of xml
+
+QuoteSee 0.1.2 [2009-04-07] Jan Zegan <jzegan@gmail.com>
+* Fixed currency rate change fetching if compiled with Qt 4.5
+* Currency rate change is displayed with 4 decimal places instead of 2
+* Stock names containing ',' display correctly, but are still limited to 17 characters
+
+QuoteSee 0.1.1 [2009-03-30] Jan Zegan <jzegan@gmail.com>
+* Fixed crashing when checking currency quotes if QuoteSee compiled with Qt 4.5 (works fine with Qt 4.4.3). Still won't work correctly but won't crash and take the desktop with it.
