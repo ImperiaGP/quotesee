@@ -40,7 +40,8 @@ class QuoteseeEngine : public Plasma::DataEngine
 
     private:
         QNetworkAccessManager *manager;
-        void            CSVtoQuoteList(QIODevice *);
+        void CSVtoQuoteList(QIODevice *);
+        void SetData();
 
     private slots:
         void replyFinished(QNetworkReply* reply);

@@ -58,7 +58,10 @@
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Debug</value>
    <value key="QtVersionId" type="int">0</value>
    <value key="ToolChain" type="int">0</value>
+   <value key="addQDumper" type=""></value>
    <value key="buildConfiguration" type="int">2</value>
+   <value key="buildDirectory" type="QString"></value>
+   <value key="useShadowBuild" type="bool">false</value>
   </valuemap>
  </data>
  <data>
@@ -66,6 +69,7 @@
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Release</value>
    <value key="QtVersionId" type="int">0</value>
+   <value key="addQDumper" type=""></value>
    <value key="buildConfiguration" type="int">0</value>
   </valuemap>
  </data>
@@ -73,12 +77,95 @@
   <variable>buildconfiguration-Debug-buildstep0</variable>
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Debug</value>
+   <valuelist key="abstractProcess.Environment" type="QVariantList">
+    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-LnDuLczpku,guid=8deb6824d07f91f7049dac824bbf9b83</value>
+    <value type="QString">DESKTOP_SESSION=default</value>
+    <value type="QString">DISPLAY=:0.0</value>
+    <value type="QString">DM_CONTROL=/var/run/xdmctl</value>
+    <value type="QString">GS_LIB=/home/josh/.fonts</value>
+    <value type="QString">GTK2_RC_FILES=/etc/gtk-2.0/gtkrc:/home/josh/.gtkrc-2.0:/home/josh/.gtkrc-2.0-kde4:/home/josh/.kde/share/config/gtkrc-2.0</value>
+    <value type="QString">GTK_RC_FILES=/etc/gtk/gtkrc:/home/josh/.gtkrc::/home/josh/.kde/share/config/gtkrc</value>
+    <value type="QString">HOME=/home/josh</value>
+    <value type="QString">KDE_FULL_SESSION=true</value>
+    <value type="QString">KDE_MULTIHEAD=false</value>
+    <value type="QString">KDE_SESSION_UID=1000</value>
+    <value type="QString">KDE_SESSION_VERSION=4</value>
+    <value type="QString">LANG=en_US.UTF-8</value>
+    <value type="QString">LANGUAGE=</value>
+    <value type="QString">LD_LIBRARY_PATH=/opt/qtcreator-1.3.1/lib/qtcreator:</value>
+    <value type="QString">LOGNAME=josh</value>
+    <value type="QString">PATH=/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games</value>
+    <value type="QString">PWD=/home/josh/Documents</value>
+    <value type="QString">QTDIR=/usr/share/qt4</value>
+    <value type="QString">QT_PLUGIN_PATH=/home/josh/.kde/lib/kde4/plugins/:/usr/lib/kde4/plugins/</value>
+    <value type="QString">SESSION_MANAGER=local/vmdevmachine:@/tmp/.ICE-unix/1356,unix/vmdevmachine:/tmp/.ICE-unix/1356</value>
+    <value type="QString">SHELL=/bin/bash</value>
+    <value type="QString">SHLVL=0</value>
+    <value type="QString">SSH_AGENT_PID=1236</value>
+    <value type="QString">SSH_AUTH_SOCK=/tmp/ssh-WXCJHj1066/agent.1066</value>
+    <value type="QString">USER=josh</value>
+    <value type="QString">WINDOWPATH=7</value>
+    <value type="QString">XCURSOR_THEME=oxy-white</value>
+    <value type="QString">XDG_DATA_DIRS=/usr/share:/usr/share:/usr/local/share</value>
+    <value type="QString">XDG_SESSION_COOKIE=02a692e1c5ddf357cebb00324b9e44b5-1270848382.888279-1213462466</value>
+    <value type="QString">XDM_MANAGED=method=classic,auto</value>
+   </valuelist>
+   <valuelist key="abstractProcess.arguments" type="QVariantList">
+    <value type="QString">/home/josh/repositories/quotesee-dev/quotesee.pro</value>
+    <value type="QString">-spec</value>
+    <value type="QString">linux-g++</value>
+    <value type="QString">-r</value>
+    <value type="QString">CONFIG+=debug</value>
+   </valuelist>
+   <value key="abstractProcess.command" type="QString">/usr/bin/qmake-qt4</value>
+   <value key="abstractProcess.enabled" type="bool">true</value>
+   <value key="abstractProcess.workingDirectory" type="QString">/home/josh/repositories/quotesee-dev</value>
   </valuemap>
  </data>
  <data>
   <variable>buildconfiguration-Debug-buildstep1</variable>
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Debug</value>
+   <valuelist key="abstractProcess.Environment" type="QVariantList">
+    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-LnDuLczpku,guid=8deb6824d07f91f7049dac824bbf9b83</value>
+    <value type="QString">DESKTOP_SESSION=default</value>
+    <value type="QString">DISPLAY=:0.0</value>
+    <value type="QString">DM_CONTROL=/var/run/xdmctl</value>
+    <value type="QString">GS_LIB=/home/josh/.fonts</value>
+    <value type="QString">GTK2_RC_FILES=/etc/gtk-2.0/gtkrc:/home/josh/.gtkrc-2.0:/home/josh/.gtkrc-2.0-kde4:/home/josh/.kde/share/config/gtkrc-2.0</value>
+    <value type="QString">GTK_RC_FILES=/etc/gtk/gtkrc:/home/josh/.gtkrc::/home/josh/.kde/share/config/gtkrc</value>
+    <value type="QString">HOME=/home/josh</value>
+    <value type="QString">KDE_FULL_SESSION=true</value>
+    <value type="QString">KDE_MULTIHEAD=false</value>
+    <value type="QString">KDE_SESSION_UID=1000</value>
+    <value type="QString">KDE_SESSION_VERSION=4</value>
+    <value type="QString">LANG=en_US.UTF-8</value>
+    <value type="QString">LANGUAGE=</value>
+    <value type="QString">LD_LIBRARY_PATH=/opt/qtcreator-1.3.1/lib/qtcreator:</value>
+    <value type="QString">LOGNAME=josh</value>
+    <value type="QString">PATH=/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games</value>
+    <value type="QString">PWD=/home/josh/Documents</value>
+    <value type="QString">QTDIR=/usr/share/qt4</value>
+    <value type="QString">QT_PLUGIN_PATH=/home/josh/.kde/lib/kde4/plugins/:/usr/lib/kde4/plugins/</value>
+    <value type="QString">SESSION_MANAGER=local/vmdevmachine:@/tmp/.ICE-unix/1356,unix/vmdevmachine:/tmp/.ICE-unix/1356</value>
+    <value type="QString">SHELL=/bin/bash</value>
+    <value type="QString">SHLVL=0</value>
+    <value type="QString">SSH_AGENT_PID=1236</value>
+    <value type="QString">SSH_AUTH_SOCK=/tmp/ssh-WXCJHj1066/agent.1066</value>
+    <value type="QString">USER=josh</value>
+    <value type="QString">WINDOWPATH=7</value>
+    <value type="QString">XCURSOR_THEME=oxy-white</value>
+    <value type="QString">XDG_DATA_DIRS=/usr/share:/usr/share:/usr/local/share</value>
+    <value type="QString">XDG_SESSION_COOKIE=02a692e1c5ddf357cebb00324b9e44b5-1270848382.888279-1213462466</value>
+    <value type="QString">XDM_MANAGED=method=classic,auto</value>
+   </valuelist>
+   <value key="abstractProcess.IgnoreReturnValue" type="bool">false</value>
+   <valuelist key="abstractProcess.arguments" type="QVariantList">
+    <value type="QString">-w</value>
+   </valuelist>
+   <value key="abstractProcess.command" type="QString">/usr/bin/make</value>
+   <value key="abstractProcess.enabled" type="bool">true</value>
+   <value key="abstractProcess.workingDirectory" type="QString">/home/josh/repositories/quotesee-dev</value>
   </valuemap>
  </data>
  <data>

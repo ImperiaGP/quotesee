@@ -19,17 +19,19 @@
 
 #ifndef QUOTESEE_H
 #define QUOTESEE_H
+/********************************************/
 #include </usr/include/KDE/Plasma/Applet>
-#include <KDE/KIcon>
-#include <KDE/KConfigDialog>
-#include <QtGui>
-#include <QXmlStreamReader>
-#include <QHttpResponseHeader>
-#include <QtNetwork>
-#include <QHttp>
-#include <QUrl>
-#include <Plasma/DataEngine>
-#include <KUrl>
+#include </usr/include/KDE/KIcon>
+#include </usr/include/KDE/KConfigDialog>
+#include </usr/include/KDE/Plasma/DataEngine>
+#include </usr/include/KDE/KUrl>
+/********************************************/
+#include <QtGui/QtGui>
+#include <QtCore/QXmlStreamReader>
+#include <QtNetwork/QHttpResponseHeader>
+#include <QtNetwork/QtNetwork>
+#include <QtNetwork/QHttp>
+#include <QtCore/QUrl>
 #include "quote.h"
 #include "ui_qsconfig.h"
 #include "ui_qsgeneralconfig.h"

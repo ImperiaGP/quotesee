@@ -18,9 +18,9 @@
  */
 
 #include "quote.h"
-#include <QtGui>
-#include <QtGlobal>
-#include <QTextStream>
+#include <QtGui/QtGui>
+#include <QtCore/QtGlobal>
+#include <QtCore/QTextStream>
 #include <Plasma/Theme>
 #include <KRun>
 #include <Plasma/ToolTipManager>
@@ -172,7 +172,10 @@ void Quote::dataUpdated(const QString &source, const Plasma::DataEngine::Data &d
 {
     Q_UNUSED(source);
 
-//    QDateTime *now = new QDateTime(QDateTime::currentDateTime());
+    qDebug("[%s:%i] %s()",
+           ((strrchr(__FILE__, '/') ? : __FILE__ - 1) + 1),
+           __LINE__,
+           __FUNCTION__);
 
 //    if (!data.isEmpty())
 //    {
@@ -180,7 +183,9 @@ void Quote::dataUpdated(const QString &source, const Plasma::DataEngine::Data &d
 //        while (it.hasNext())
 //        {
 //            it.next();
-//            qDebug() << "----------" << (it.key() + ": " + it.value().toString());
+//            qDebug("---------- %s: %s",
+//                   it.key().toLatin1().data(),
+//                   it.value().toString().toLatin1().data());
 //        }
 //    }
     if(!data.empty())
@@ -193,8 +198,13 @@ void Quote::dataUpdated(const QString &source, const Plasma::DataEngine::Data &d
         lastTradeTime = data["last_trade_time"].toString();
         lastTradeDate = data["last_trade_date"].toString();
     }
-//    qDebug() << "dataUpdated" << now->time().toString() << "\t"
-//             << code << name << lastTrade << change << lastTradeTime << lastTradeDate;
+    qDebug("  -> %s | %s | %s | %s | %s | %s\n",
+           code.toLatin1().data(),
+           name.toLatin1().data(),
+           lastTrade.toLatin1().data(),
+           change.toLatin1().data(),
+           lastTradeTime.toLatin1().data(),
+           lastTradeDate.toLatin1().data());
 
     if (Plasma::ToolTipManager::self()->isVisible(this))
     {

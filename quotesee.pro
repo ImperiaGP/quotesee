@@ -17,7 +17,8 @@ HEADERS += data_engine/useyql.h \
     src/quote.h \
     src/qsgeneralconfig.h \
     src/qsconfig.h \
-    src/mrudeque.h
+    src/mrudeque.h \
+    qsdebug.h
 OTHER_FILES += data_engine/plasma-dataengine-quotesee.desktop \
     data_engine/CMakeLists.txt \
     icons/CMakeLists.txt \
@@ -27,6 +28,11 @@ OTHER_FILES += data_engine/plasma-dataengine-quotesee.desktop \
     src/CMakeLists.txt \
     CMakeLists.txt \
     ChangeLog.txt \
-    install.sh
+    install.sh \
+    CMakeLists.txt \
+    ChangeLog.txt \
+    src/CMakeLists.txt \
+    icons/CMakeLists.txt \
+    data_engine/CMakeLists.txt
 FORMS += src/qsgeneralconfig.ui \
     src/qsconfig.ui

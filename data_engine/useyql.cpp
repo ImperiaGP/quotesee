@@ -35,7 +35,12 @@ void UseYQL::replyFinished(QNetworkReply *reply)
 {
     if (reply->error() != QNetworkReply::NoError)
     {
-        qWarning("Request failed, network error: ");
+        qDebug("[%s]-- %s:%i -- network error, check next message for details",
+               ((strrchr(__FILE__, '/') ? : __FILE__ - 1) + 1),
+               __FUNCTION__,
+               __LINE__);
+        qWarning("Request failed, network error: %s",
+                 reply->errorString().toLatin1().data());
         return;
     }
     else
@@ -72,6 +77,12 @@ void UseYQL::fetchCurrencyChange()
 void UseYQL::processXML(QIODevice *r)
 {
     QByteArray out(r->readAll());
+
+    qDebug("[%s]-- %s:%i -- result of network reply, should be xml with 2 same nodes to parse %s",
+           ((strrchr(__FILE__, '/') ? : __FILE__ - 1) + 1),
+           __FUNCTION__,
+           __LINE__, QString(out).toLatin1().data());
+
     QBuffer buff(&out);
     buff.open(QIODevice::ReadWrite);
 

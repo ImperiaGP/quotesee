@@ -17,7 +17,9 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include <Plasma/DataContainer>
+/********************************************/
+#include </usr/include/KDE/Plasma/DataContainer>
+/********************************************/
 #include "quoteseeengine.h"
 #include "useyql.h"
 
@@ -77,7 +79,28 @@ void QuoteseeEngine::replyFinished(QNetworkReply *reply)
 {
     if (reply->error() != QNetworkReply::NoError)
     {
-        qWarning("Request failed, network error");
+//        setData(reply->url().queryItemValue("name"), "status", false);
+//        setData(reply->url().queryItemValue("name"), "code", reply->url().queryItemValue("name"));
+//        setData(reply->url().queryItemValue("name"), "change", "N/A");
+//        setData(reply->url().queryItemValue("name"), "last_trade", "Network Error");
+//        setData(reply->url().queryItemValue("name"), "last_trade_date", "N/A");
+//        setData(reply->url().queryItemValue("name"), "last_trade_time", "N/A");
+//        setData(reply->url().queryItemValue("name"), "name", "Request failed");
+
+        qDebug("[%s:%i] %s()",
+               ((strrchr(__FILE__, '/') ? : __FILE__ - 1) + 1),
+               __LINE__,
+               __FUNCTION__);
+
+//        qDebug("data[] %s | %s | %s | %s | %s | %s\n",
+//               reply->url().queryItemValue("name").toLatin1().data(),
+//               Data().value("name").toString().toLatin1().data(),
+//               Data().value("last_trade").toString().toLatin1().data(),
+//               Data().value("change"    ).toString().toLatin1().data(),
+//               Data().value("last_trade_time").toString().toLatin1().data(),
+//               Data().value("last_trade_date").toString().toLatin1().data());
+
+        qWarning("Request failed, network error: %s", reply->errorString().toLatin1().data());
     }
     else
         CSVtoQuoteList(reply);
@@ -86,7 +109,17 @@ void QuoteseeEngine::replyFinished(QNetworkReply *reply)
 void QuoteseeEngine::getChangeData(QString code, QString change)
 {
     Q_UNUSED(code);
+    qDebug("[%s:%i] %s()\t %s",
+           ((strrchr(__FILE__, '/') ? : __FILE__ - 1) + 1),
+           __LINE__,__FUNCTION__,
+           change.toLatin1().data());
+
     setData(code, "change", change);
+
+    qDebug("[%s:%i] %s()\tafter set data",
+           ((strrchr(__FILE__, '/') ? : __FILE__ - 1) + 1),
+           __LINE__,
+           __FUNCTION__);
 }
 void QuoteseeEngine::CSVtoQuoteList(QIODevice *resp)
 {
@@ -115,7 +148,19 @@ void QuoteseeEngine::CSVtoQuoteList(QIODevice *resp)
             }
             else
             {
+                qDebug("[%s:%i] %s()\t--setting change for item %s",
+                       ((strrchr(__FILE__, '/') ? : __FILE__ - 1) + 1),
+                       __LINE__,
+                       __FUNCTION__,
+                       code.toLatin1().data());
+
                 setData(code, "change", (*stringListIterator).section(",",2,2));
+
+                qDebug("[%s:%i] %s() change set for item %s",
+                       ((strrchr(__FILE__, '/') ? : __FILE__ - 1) + 1),
+                       __LINE__,
+                       __FUNCTION__,
+                       code.toLatin1().data());
             }
         }
         else

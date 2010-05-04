@@ -18,51 +18,18 @@
  */
 
 #include "quotesee.h"
-#include <QFile>
-#include <QTextStream>
-
-//#include <QDateTime>
-//#include <QDebug>
+#include <QtCore/QFile>
+#include <QtCore/QTextStream>
+#define ___FILE___ ((strrchr(__FILE__, '/') ? : __FILE__ - 1) + 1)
+#if !defined(QT_NO_DEBUG_OUTPUT)
+#include "qsdebug.h"
+#endif
 
 using namespace::std;
 
 #define UNIT_INTERVAL   60*1000
 #define MINUTE_INTERVAL 1
 #define MARGIN          14
-
-//void debugOutput(QtMsgType type, const char *msg)
-// {
-//    QFile file("--SOME_LOCATION--");
-//
-//    if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append))
-//        return;
-//
-//    QTextStream out(&file);
-//
-//     switch (type)
-//     {
-//         case QtDebugMsg:
-//             out << "Debug:\t";
-//             out << msg << endl;
-//             break;
-//
-//         case QtWarningMsg:
-//             out << "Warning:\t";
-//             out << msg << endl;
-//             break;
-//
-//         case QtCriticalMsg:
-//             out << "Critical:\t";
-//             out << msg << endl;
-//             break;
-//
-//         case QtFatalMsg:
-//             out << "Fatal:\t";
-//             out << msg << endl;
-//             abort();
-//     }
-//     file.close();
-// }
 
 QuoteSee::QuoteSee(QObject *parent, const QVariantList &args) :
     Plasma::Applet(parent, args),
@@ -75,7 +42,11 @@ QuoteSee::QuoteSee(QObject *parent, const QVariantList &args) :
     m_polling_interval(UNIT_INTERVAL),
     m_translucent(true)
 {
-//    qInstallMsgHandler(debugOutput);
+#if !defined(NO_DEBUG_TO_FILE)
+    qInstallMsgHandler(qsDebug::debugOutput);
+#endif
+
+    qDebug("\n\n-------------------\nQuoteSee instance start\n-------------------");
 
     setHasConfigurationInterface(true);
 
@@ -114,6 +85,7 @@ QuoteSee::~QuoteSee()
         kWarning() << "QuoteSee has failed to launch";
     }
     delete fileLocation;
+    qDebug("\n\n-------------------\nQuoteSee instance end\n-------------------");
 }
 
 void QuoteSee::init()
@@ -148,14 +120,43 @@ void QuoteSee::init()
 }
 
 void QuoteSee::dataUpdated(const QString& source, const Plasma::DataEngine::Data& data)
+// source holds a string with name of the item, stock or currency (goog, usdgbp=x,etc)
+// data contains the change value
 {
     Plasma::DataEngine::DataIterator it(data);
 
 //    QDateTime *now = new QDateTime(QDateTime::currentDateTime());
+    Q_ASSERT_X(!source.isEmpty(), "in dataUpdated", "source is empty");
+    Q_ASSERT_X(data.empty(), "in dataUpdated", "data is empty");
+qDebug() << "WTF IS THIS SHIT";
+#if !defined(QT_NO_DEBUG_OUTPUT)
+    if (!data.isEmpty())
+        {
+            QHashIterator<QString, QVariant> it(data);
+            while (it.hasNext())
+            {
+                it.next();
+                qDebug("---------- %s: %s",
+                       it.key().toLatin1().data(),
+                       it.value().toString().toLatin1().data());
+            }
+        }
+#endif
 
     if(!data.empty() && m_quote_hash.value(source) != 0)
     {
+        qDebug("[%s:%i] %s()\t for item: %s",
+               ___FILE___,
+               __LINE__,
+               __FUNCTION__, source.toLatin1().data());
+
         emit m_quote_hash.value(source)->dataUpdated(source, data);
+
+        qDebug("[%s:%i] %s()\t%s",
+               ___FILE___,
+               __LINE__,
+               __FUNCTION__,
+               "after dataUpdated");
     }
 }
 
@@ -193,12 +194,12 @@ void QuoteSee::connectSources()
     {
         Quote* quote = new Quote(this);
 
-        m_engine->connectSource(code.toLower(), quote, m_polling_interval * m_polling_minutes);
+        m_engine->connectSource(code.toLower(), quote, 10000 /*m_polling_interval * m_polling_minutes*/);
 
         m_quote_list.append(quote);
 
         m_quote_hash.insert(code.toLower(), quote);
-        m_engine->connectSource(code.toLower(), this);
+//        m_engine->connectSource(code.toLower(), this);
     }
 }
 
@@ -207,7 +208,7 @@ void QuoteSee::disconnectSources()
     foreach(QGraphicsWidget *q, m_quote_list)
     {
         m_engine->disconnectSource(dynamic_cast<Quote *>(q)->getName(), q);
-        m_engine->disconnectSource(dynamic_cast<Quote *>(q)->getName(), this);
+//        m_engine->disconnectSource(dynamic_cast<Quote *>(q)->getName(), this);
     }
 }
 
@@ -229,8 +230,9 @@ void QuoteSee::createConfigurationInterface(KConfigDialog *parent)
 
     m_config_ui.setupUi(configInterface);
     m_config_ui.quoteCodeList->setItems(m_code_list);
-
-    m_config_ui.ieCodesRequester->setPath(fileLocation->absoluteFilePath());
+// USE setURL instead of setPath http://api.kde.org/4.4-api/kdelibs-apidocs/kio/html/classKUrlRequester.html#a62b31e599dc2626a94b43f38147bf6f3
+    m_config_ui.ieCodesRequester->setUrl(KUrl(fileLocation->absoluteFilePath()));
+//    m_config_ui.ieCodesRequester->setPath(fileLocation->absoluteFilePath());
 
     m_config_ui.ieCodesRequester->setMode(KFile::File | KFile::LocalOnly | KFile::ExistingOnly);
     m_config_ui.ieCodesRequester->setMode(KFile::File | KFile::LocalOnly);
@@ -346,7 +348,7 @@ void QuoteSee::saveFile()
     }
      else
      {
-        kWarning() << "Error: " << file.errorString();
+        qWarning() << "Error: " << file.errorString();
         return;
     }
     file.close();
