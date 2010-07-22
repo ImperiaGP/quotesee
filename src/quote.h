@@ -26,12 +26,22 @@
 #include <Plasma/Svg>
 #include <Plasma/IconWidget>
 #include <Plasma/DataEngine>
+#include "plotter.h"
+#include "mrideque.h"
 
 namespace Plasma
 {
   class IconWidget;
   class Svg;
 }
+//namespace QSParent
+//{
+//    struct Parent
+//    {
+//        int width;
+//        int height;
+//    };
+//}
 
 class Quote : public QGraphicsWidget
 {
@@ -43,11 +53,14 @@ class Quote : public QGraphicsWidget
         ~Quote();
 
         virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
-
+        /**
+         * @short returns @param name associated with the item
+         */
         QString getName() {return name;}
+        /**
+         * @short returns @param code associated with the item
+         */
         QString getCode() {return code;}
-        QString getLastTrade() {return lastTrade;}
-        QString getChange() {return change;}
 
     private:
         enum    Status {ERROR, SUCCESS, PROCESSING};
@@ -62,20 +75,48 @@ class Quote : public QGraphicsWidget
         Plasma::Svg *m_item_background;
         Plasma::IconWidget *m_ext_icon;
 
+        Plotter *m_plotter;
+
+        KPlotObject * ob;
+        struct PlotPoint
+        {
+            double axisTime;
+            double actualTime;
+            QString yahooTime;
+            double price;
+        };
+        MRIDeque<PlotPoint> *points;
+        int updateNum;
+        double minPrice;
+        double maxPrice;
+
     public slots:
-        // updated data, needed for data engine
+        /**
+         * @brief updated data, needed for data engine
+         * @param source ticker symbol for the source
+         * @param data data containing stock symbol, name, last trade,
+         *        last trade date, last trade time, change
+         */
         void    dataUpdated(const QString &source, const Plasma::DataEngine::Data &data);
 
     protected slots:
-        // displays last trade date and time
-        void    toolTipAboutToShow();
-        // opens browser on finance.yahoo.com page for the given ticker symbol
+        /**
+         * @short displays last trade date and time
+         */
+//        void    toolTipAboutToShow();
+        /**
+         * @short opens browser on finance.yahoo.com page for the given ticker symbol
+         */
         void    iconClicked();
 
     protected:
-        // hovering over widget will resize frame to make space for icon for opening browser
+        /**
+         * @short hovering over widget will resize frame to make space for icon for opening browser
+         */
         virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-        // will resize frame to previous size
+        /**
+         * will resize frame to previous size
+         */
         virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 };
 typedef QList<Quote> Quotes;

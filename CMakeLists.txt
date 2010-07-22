@@ -19,3 +19,4 @@ include_directories(
 add_subdirectory (src)
 add_subdirectory (icons)
 add_subdirectory (data_engine)
+add_subdirectory (plotting)

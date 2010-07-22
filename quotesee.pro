@@ -8,7 +8,12 @@ SOURCES += data_engine/useyql.cpp \
     src/quotesee.cpp \
     src/quote.cpp \
     src/qsgeneralconfig.cpp \
-    src/qsconfig.cpp
+    src/qsconfig.cpp \
+    src/plotter.cpp \
+    plotting/kplotwidget.cpp \
+    plotting/kplotpoint.cpp \
+    plotting/kplotobject.cpp \
+    plotting/kplotaxis.cpp
 HEADERS += data_engine/useyql.h \
     data_engine/quoteseeengine.h \
     src/ui_qsgeneralconfig.h \
@@ -17,8 +22,14 @@ HEADERS += data_engine/useyql.h \
     src/quote.h \
     src/qsgeneralconfig.h \
     src/qsconfig.h \
-    src/mrudeque.h \
-    qsdebug.h
+    qsdebug.h \
+    src/plotter.h \
+    src/mrideque.h \
+    src/axisscale.h \
+    plotting/kplotwidget.h \
+    plotting/kplotpoint.h \
+    plotting/kplotobject.h \
+    plotting/kplotaxis.h
 OTHER_FILES += data_engine/plasma-dataengine-quotesee.desktop \
     data_engine/CMakeLists.txt \
     icons/CMakeLists.txt \
@@ -33,6 +44,13 @@ OTHER_FILES += data_engine/plasma-dataengine-quotesee.desktop \
     ChangeLog.txt \
     src/CMakeLists.txt \
     icons/CMakeLists.txt \
-    data_engine/CMakeLists.txt
+    data_engine/CMakeLists.txt \
+    plotting/README \
+    plotting/plotting.includes \
+    plotting/plotting.files \
+    plotting/plotting.creator.user \
+    plotting/plotting.creator \
+    plotting/plotting.config \
+    plotting/CMakeLists.txt
 FORMS += src/qsgeneralconfig.ui \
     src/qsconfig.ui

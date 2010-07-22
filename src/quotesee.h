@@ -49,9 +49,14 @@ public:
     void            createConfigurationInterface(KConfigDialog *parent);
 
 private:
+    /**
+     * @short holds list of Quote items, useful for displaying items in user entered order
+     */
     typedef         QList<QGraphicsWidget *> WidgetList;
-    typedef         QHash<QString, Quote *> WidgetHash;
 
+    /**
+     * @short icon for the widget
+     */
     KIcon           m_icon;
 
     Ui::QSConfig    m_config_ui;
@@ -59,7 +64,6 @@ private:
 
     QStringList     m_code_list;
     WidgetList      m_quote_list;
-    WidgetHash      m_quote_hash;
 
     QGraphicsLinearLayout   *m_layout;
 
@@ -82,9 +86,6 @@ private:
 
     void            readConfig();
     void            saveConfig();
-
-public slots:
-    void            dataUpdated(const QString& source, const Plasma::DataEngine::Data& data);
 
 private slots:
     void            createConfig();

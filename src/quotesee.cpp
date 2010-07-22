@@ -42,18 +42,20 @@ QuoteSee::QuoteSee(QObject *parent, const QVariantList &args) :
     m_polling_interval(UNIT_INTERVAL),
     m_translucent(true)
 {
-#if !defined(NO_DEBUG_TO_FILE)
-    qInstallMsgHandler(qsDebug::debugOutput);
-#endif
+//#if !defined(NO_DEBUG_TO_FILE)
+//    qInstallMsgHandler(qsDebug::debugOutput);
+//#endif
 
     qDebug("\n\n-------------------\nQuoteSee instance start\n-------------------");
 
+    qDebug() << "size on start: " << this->size().width() << this->size().height();
     setHasConfigurationInterface(true);
 
     setAspectRatioMode(Plasma::IgnoreAspectRatio);
 
     setMinimumSize(270, 100);
     setPreferredSize(270, 100);
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 }
 
 void QuoteSee::readConfig()
@@ -119,47 +121,6 @@ void QuoteSee::init()
         setConfigurationRequired(true, "Enter some ticker symbols");
 }
 
-void QuoteSee::dataUpdated(const QString& source, const Plasma::DataEngine::Data& data)
-// source holds a string with name of the item, stock or currency (goog, usdgbp=x,etc)
-// data contains the change value
-{
-    Plasma::DataEngine::DataIterator it(data);
-
-//    QDateTime *now = new QDateTime(QDateTime::currentDateTime());
-    Q_ASSERT_X(!source.isEmpty(), "in dataUpdated", "source is empty");
-    Q_ASSERT_X(data.empty(), "in dataUpdated", "data is empty");
-qDebug() << "WTF IS THIS SHIT";
-#if !defined(QT_NO_DEBUG_OUTPUT)
-    if (!data.isEmpty())
-        {
-            QHashIterator<QString, QVariant> it(data);
-            while (it.hasNext())
-            {
-                it.next();
-                qDebug("---------- %s: %s",
-                       it.key().toLatin1().data(),
-                       it.value().toString().toLatin1().data());
-            }
-        }
-#endif
-
-    if(!data.empty() && m_quote_hash.value(source) != 0)
-    {
-        qDebug("[%s:%i] %s()\t for item: %s",
-               ___FILE___,
-               __LINE__,
-               __FUNCTION__, source.toLatin1().data());
-
-        emit m_quote_hash.value(source)->dataUpdated(source, data);
-
-        qDebug("[%s:%i] %s()\t%s",
-               ___FILE___,
-               __LINE__,
-               __FUNCTION__,
-               "after dataUpdated");
-    }
-}
-
 void QuoteSee::addSource(const QString& source)
 {
     Q_UNUSED(source);
@@ -168,24 +129,24 @@ void QuoteSee::addSource(const QString& source)
 
 void QuoteSee::constraintsEvent(Plasma::Constraints constraints)
 {
-    if (constraints & Plasma::FormFactorConstraint || constraints & Plasma::SizeConstraint )
-    {
-        setBackgroundHints(m_translucent == true ? Plasma::Applet::TranslucentBackground
-                                                 : Plasma::Applet::DefaultBackground);
+//    if (constraints & Plasma::FormFactorConstraint || constraints & Plasma::SizeConstraint )
+//    {
+//        setBackgroundHints(m_translucent == true ? Plasma::Applet::TranslucentBackground
+//                                                 : Plasma::Applet::DefaultBackground);
 
-//        qreal left = MARGIN, top = MARGIN, right = MARGIN, bottom = MARGIN;
-//        setContentsMargins(left, top, right, bottom);
+////        qreal left = MARGIN, top = MARGIN, right = MARGIN, bottom = MARGIN;
+////        setContentsMargins(left, top, right, bottom);
 
-        // this isn't great, research other ways to adjust size
-        setContentsMargins(MARGIN, MARGIN, MARGIN, MARGIN);
+//        // this isn't great, research other ways to adjust size
+//        setContentsMargins(MARGIN, MARGIN, MARGIN, MARGIN);
 
         resize(m_layout->sizeHint(Qt::PreferredSize) + QSizeF(MARGIN+MARGIN, MARGIN+MARGIN));
-    }
+//    }
 
-    if(layout()->count() == 1)
-    {
-        setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    }
+//    if(layout()->count() == 1)
+//    {
+//        setContentsMargins(0.0, 0.0, 0.0, 0.0);
+//    }
 }
 
 void QuoteSee::connectSources()
@@ -194,12 +155,9 @@ void QuoteSee::connectSources()
     {
         Quote* quote = new Quote(this);
 
-        m_engine->connectSource(code.toLower(), quote, 10000 /*m_polling_interval * m_polling_minutes*/);
+        m_engine->connectSource(code.toLower(), quote, 1000 /*m_polling_interval * m_polling_minutes*/);
 
         m_quote_list.append(quote);
-
-        m_quote_hash.insert(code.toLower(), quote);
-//        m_engine->connectSource(code.toLower(), this);
     }
 }
 
@@ -208,7 +166,6 @@ void QuoteSee::disconnectSources()
     foreach(QGraphicsWidget *q, m_quote_list)
     {
         m_engine->disconnectSource(dynamic_cast<Quote *>(q)->getName(), q);
-//        m_engine->disconnectSource(dynamic_cast<Quote *>(q)->getName(), this);
     }
 }
 
@@ -282,7 +239,6 @@ void QuoteSee::paintQuotes()
     disconnectSources();
     cleanLayout(m_layout);
     m_quote_list.clear();
-    m_quote_hash.clear();
     connectSources();
 
     foreach(QGraphicsWidget *q, m_quote_list)
