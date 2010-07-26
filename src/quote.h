@@ -75,17 +75,17 @@ class Quote : public QGraphicsWidget
         Plasma::Svg *m_item_background;
         Plasma::IconWidget *m_ext_icon;
 
-        Plotter *m_plotter;
+//        Plotter *m_plotter;
 
-        KPlotObject * ob;
-        struct PlotPoint
-        {
-            double axisTime;
-            double actualTime;
-            QString yahooTime;
-            double price;
-        };
-        MRIDeque<PlotPoint> *points;
+//        KPlotObject * ob;
+//        struct PlotPoint
+//        {
+//            double axisTime;
+//            double actualTime;
+//            QString yahooTime;
+//            double price;
+//        };
+//        MRIDeque<PlotPoint> *points;
         int updateNum;
         double minPrice;
         double maxPrice;

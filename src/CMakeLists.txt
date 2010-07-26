@@ -2,11 +2,7 @@ set(quotesee_SRCS quotesee.cpp
     quote.cpp
     qsconfig.cpp
     qsgeneralconfig.cpp
-    plotter.cpp
-    ../plotting/kplotaxis.cpp
-    ../plotting/kplotpoint.cpp
-    ../plotting/kplotobject.cpp
-    ../plotting/kplotwidget.cpp)
+)
 
 kde4_add_ui_files(qsconfig_SRCS qsconfig.ui qsgeneralconfig.ui)
 kde4_add_plugin(plasma_applet_quotesee ${quotesee_SRCS})
