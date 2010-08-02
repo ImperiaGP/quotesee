@@ -1,168 +1,131 @@
-//#include "plotter.h"
-//#include "plotting/kplotwidget.h"
-//#include "plotting/kplotobject.h"
-//#include "plotting/kplotaxis.h"
+#include <QTime>
+#include <QtDebug>
+#include <qwt-qt4/qwt_scale_widget.h>
+#include <qwt-qt4/qwt_plot_marker.h>
+#include <qwt-qt4/qwt_plot_curve.h>
+#include <qwt-qt4/qwt_legend.h>
+#include <qwt-qt4/qwt_symbol.h>
+#include <qwt-qt4/qwt_data.h>
 
-//#include <QGraphicsLinearLayout>
-//#include <kdebug.h>
-//#include <QGraphicsScene>
-//#include <QGraphicsProxyWidget>
+#include <QGraphicsScene>
+#include <QGraphicsLinearLayout>
+#include <QGraphicsProxyWidget>
+#include <QWidget>
 
-//#include <plasma/svg.h>
-//#include "plasma/theme.h"
-//#include <QtGui>
-//#include <QLabel>
+#include "plotter.h"
 
-//#include "axisscale.h"
+#include <QDebug>
 
-//using namespace::std;
+Plotter::Plotter(QGraphicsItem* parent, Qt::WindowFlags wFlags)
+    : QGraphicsWidget(parent, wFlags),
+        m_plot(0),
+        m_layout(0),
+        m_item_background(new Plasma::Svg(this))
+{
+    m_plot = new QwtPlot;
 
-//Plotter::Plotter(QGraphicsWidget *parent) :
-//        QGraphicsWidget(parent),
-//        m_layout(0),
-//        m_plot(0),
-//        m_item_background(new Plasma::Svg(this))
-//{
-//    m_layout = new QGraphicsLinearLayout(Qt::Vertical, this);
-//    m_layout->addStretch();
+    m_plot->setMinimumSize(300, 250);
+//    m_plot->setmax
+//    m_plot->setPreferredSize(400, 300);
+    m_plot->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-//    addInfoLabel();
+    m_plot->setAxisScaleDraw(QwtPlot::xBottom, new TimeScaleDraw(QTime::currentTime()));        // time scale with starting point
+//    setAxisScale(QwtPlot::xBottom, AXIS_LENGHT, (double)QTime::currentTime().minute(), 1); // length of the scale
+    m_plot->setAxisScale(QwtPlot::yRight, 1.39, 8.32);
+    m_plot->setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignRight | Qt::AlignBottom);
 
-//    addPlot();
-//    configPlot();
-////    addPlotPoints();
+    QwtScaleWidget *scaleWidget = m_plot->axisWidget(QwtPlot::xBottom);
+    const int fmh = QFontMetrics(scaleWidget->font()).height();
+    scaleWidget->setMinBorderDist(0, fmh / 2);
+    m_plot->setAxisLabelRotation(QwtPlot::xBottom, -50.0);
+    m_plot->setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignLeft | Qt::AlignBottom);
 
-//    setLayout(m_layout);
-//}
-//void Plotter::setLabelText(QString text)
-//{
-//    infoLabel->setText(text);
-//}
+    // Set axis titles
+    m_plot->enableAxis(QwtPlot::yLeft, false);
+    m_plot->enableAxis(QwtPlot::yRight);
+//    setAxisTitle(QwtPlot::yRight, "Price");
 
-//void Plotter::addInfoLabel()
-//{
-//    infoLabel = new QLabel();
-//    infoLabel->setTextFormat(Qt::RichText);
-//    infoLabel->setMinimumHeight(35);
+    QwtSymbol sym;
+    sym.setStyle(QwtSymbol::Ellipse);
+    sym.setPen(QColor(Qt::blue));
+    sym.setBrush(QColor(Qt::yellow));
+    sym.setSize(5);
 
-//    QGraphicsProxyWidget *proxy;
-//    QGraphicsScene scene;
-//    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout;
-//    QGraphicsWidget *form = new QGraphicsWidget;
+    // Insert new curves
+    QwtPlotCurve *stockPlot = new QwtPlotCurve("stock");
+    stockPlot->setSymbol(sym);
+    #if QT_VERSION >= 0x040000
+        stockPlot->setRenderHint(QwtPlotItem::RenderAntialiased);
+    #endif
 
-//    proxy = scene.addWidget(infoLabel);
-//    layout->addItem(proxy);
-//    form->setLayout(layout);
+    QTime now = QTime::currentTime();
+    QVector<double> *x = new QVector<double>();
+QTime temp;
 
-//    m_layout->addItem(form);
-//}
+for(int i = 0; i < 7; i++)
+{
+    temp = QTime::currentTime().addSecs(i*60);
+    int m = temp.minute();
+    if(m  < now.minute())
+    {
+        x->append((double)(now.minute() % 10) + m);
+        qDebug() << temp << now.hour() << m << now.minute() << (now.minute() % 10) + m;
+    }
+    else
+    {
+        x->append((double)(m - now.minute()));
+        qDebug() << temp << m << now.minute() << m - now.minute();
+    }
+//                x->append((double)QTime::currentTime().addSecs(i*60).minute());
 
-//void Plotter::addPlot()
-//{
-//    m_plot = new KPlotWidget();
+}
 
-//    QGraphicsProxyWidget *proxy;
-//    QGraphicsScene scene;
-//    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout;
-//    QGraphicsWidget *form = new QGraphicsWidget;
+QVector<double> *y = new QVector<double>();
+y->append(2.23);
+y->append(5.23);
+y->append(2.96);
+y->append(8.32);
+y->append(7.12);
+y->append(6.3);
+y->append(1.39);
 
-//    proxy = scene.addWidget(m_plot);
-//    layout->addItem(proxy);
-//    form->setLayout(layout);
+stockPlot->setPen(QPen(Qt::blue));
+stockPlot->attach(m_plot);
+stockPlot->setData(*x, *y);
 
-//    m_layout->addItem(form);
-//}
 
-//void Plotter::configPlot()
-//{
-////    setContentsMargins(0, 20, 0, 0);
+    m_layout = new QGraphicsLinearLayout(Qt::Vertical, this);
+    m_layout->addStretch();
 
-//    m_plot->setShowGrid( false ); // no grid please
-//    m_plot->setBackgroundColor(QColor(255, 255, 255) );
-//    m_plot->setForegroundColor(QColor(0, 0, 0));
-////    m_plot->setLimits(0.0, 5.0, -1.0, 5.0 );
-//    m_plot->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-////    m_plot->setMaximumSize(270, 100);
-////    m_plot->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-//    m_plot->setLeftPadding(5);
-//    m_plot->setRightPadding(40);
-//    m_plot->setBottomPadding(25);
-//    m_plot->setTopPadding(5);
-//    m_plot->axis(KPlotWidget::RightAxis)->setTickLabelsShown(true);
-//    m_plot->axis(KPlotWidget::BottomAxis)->setTickLabelsShown(true);
-////    m_plot->axis(KPlotWidget::BottomAxis)->setTickMarks(0.0, 0.0);
-//    m_plot->axis(KPlotWidget::TopAxis)->setTickLabelsShown(false);
-//    m_plot->axis(KPlotWidget::LeftAxis)->setTickLabelsShown(false);
+    QGraphicsScene scene;
+    QGraphicsProxyWidget *proxy = scene.addWidget(m_plot);
 
-//    m_plot->axis(KPlotWidget::RightAxis)->setTickMarks(0.0, 0.0);
-//    m_plot->axis(KPlotWidget::BottomAxis)->setTickMarks(0.0, 0.0);
-//    m_plot->setShowGrid(true);
-//    m_plot->axis(KPlotWidget::BottomAxis)->setTickLabelFormat('t');
-////    m_plot->axis(KPlotWidget::RightAxis)->setLabel("price");
-//    resize( 400, 200);
-//}
+    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout;
+    layout->addItem(proxy);
 
-//void Plotter::addPlotPoints()
-//{
-////    // Create plot object
-////    KPlotObject * ob = new KPlotObject(Qt::red, KPlotObject::Lines, 2, KPlotObject::Circle);
-////    // Add plot object to chart
-////    m_plot->addPlotObject(ob);
-////    ob->setShowPoints(true);
-////    // Add some random points to the plot object
-////    double s = 0;
-//////    srand(time(NULL));
-////    ob->addPoint( QPoint(0, 0) );
-////    for (unsigned int i=0; i<=5; i += 1) {
-////            s = rand()*(4.9)/RAND_MAX;
-////            ob->addPoint( QPoint(i, s), QString::number(s).left(4));
-////            kDebug() << "Adding point [" << i << "," << s << "]" << endl;
-////    }
-//}
+    QGraphicsWidget *form = new QGraphicsWidget;
+    form->setLayout(layout);
 
-//QList< KPlotObject* > Plotter::plotObjects() const
-//{
-//    return m_plot->plotObjects();
-//}
+    m_layout->addItem(form);
 
-//void Plotter::setLimits( double x1, double x2, double y1, double y2 )
-//{
-//    double inc;
+//    m_plot->resize(350, 300);
+    resize(370, 320);
 
-//    double *yp1 = &y1, *yp2 = &y2;
-//    double *xp1 = &x1, *xp2 = &x2;
+}
+void Plotter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+    painter->save();
 
-////    *xp1 = *xp1 - (0.02);
-////    *xp2 = *xp2 + (0.02);
-////    *yp1 = *yp1 - 0.02;
-////    *yp2 = *yp2 + 0.02;
-//    kDebug() << "[scale]:" << x1 << x2 << *yp1 << *yp2;
-//    AxisScale::DefineAxis(yp1, yp2, &inc);
-////    AxisScale::DefineAxis(x1, x2, &inc);
+    m_item_background->setImagePath("quotesee/itemBackground");
 
-////    qDebug() << "[adjusted scale]:" << *xp1 << *xp2 << *yp1 << *yp2;
-//    m_plot->setLimits(x1, x2, *yp1, *yp2);
-////    kDebug() << "major tick marks:" << m_plot->axis(KPlotWidget::BottomAxis)->majorTickMarks();
-////    m_plot->setLimits(floor(*xp1), ceil(*xp2), floor(*yp1), ceil(*yp2));
-//}
+    m_item_background->resize(contentsRect().width(), contentsRect().height());
+    m_item_background->paint(painter,0, 0);
 
-//void Plotter::addPlotObject(KPlotObject *object)
-//{
-//    m_plot->addPlotObject(object);
-//}
+    painter->setRenderHint(QPainter::SmoothPixmapTransform);
+    painter->setRenderHint(QPainter::Antialiasing);
 
-//void Plotter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-//{
-//    Q_UNUSED(option);
-//    Q_UNUSED(widget);
-
-//    QRectF frame;
-
-//    frame.setTopLeft(QPoint(0, 0));
-//    frame.setSize(contentsRect().size().toSize());
-
-//    m_item_background->setImagePath("quotesee/itemBackground");
-
-//    m_item_background->resize(contentsRect().width(), contentsRect().height());
-//    m_item_background->paint(painter,0, 0);
-//}
+    painter->restore();
+    update();
+}

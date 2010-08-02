@@ -1,10 +1,10 @@
 /********************************************************************************
-** Form generated from reading ui file 'qsconfig.ui'
+** Form generated from reading UI file 'qsconfig.ui'
 **
-** Created: Wed Apr 14 21:58:02 2010
-**      by: Qt User Interface Compiler version 4.5.2
+** Created: Tue Jul 27 05:33:59 2010
+**      by: Qt User Interface Compiler version 4.7.0
 **
-** WARNING! All changes made in this file will be lost when recompiling ui file!
+** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
 #ifndef UI_QSCONFIG_H
@@ -110,7 +110,6 @@ public:
         loadButton->setText(QApplication::translate("QSConfig", "Load", 0, QApplication::UnicodeUTF8));
         saveButton->setText(QApplication::translate("QSConfig", "Save", 0, QApplication::UnicodeUTF8));
         manageSymbolsGroupBox->setTitle(QApplication::translate("QSConfig", "Manage symbols", 0, QApplication::UnicodeUTF8));
-        Q_UNUSED(QSConfig);
     } // retranslateUi
 
 };

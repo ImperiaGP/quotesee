@@ -1,76 +1,42 @@
-//#ifndef PLOTTER_H
-//#define PLOTTER_H
+#ifndef PLOTTER_H
+#define PLOTTER_H
 
-//#include <QGraphicsWidget>
+#define AXIS_LENGHT 10
 
-//class QGraphicsProxyWidget;
-//class QGraphicsLinearLayout;
-//class KPlotObject;
-//class KPlotWidget;
-//class QLabel;
+#include <qwt-qt4/qwt_plot.h>
+#include <qwt-qt4/qwt_scale_draw.h>
+#include <qwt-qt4/qwt_text.h>
+#include <QGraphicsWidget>
+#include <QPainter>
+#include <QStyleOptionGraphicsItem>
+#include <Plasma/Svg>
 
-//namespace Plasma
-//{
-//  class Svg;
-//}
+class QGraphicsLinearLayout;
 
-//class Plotter : public QGraphicsWidget
-//{
-//    Q_OBJECT
-//public:
-//    explicit Plotter(QGraphicsWidget *parent);
+class TimeScaleDraw: public QwtScaleDraw
+{
+public:
+    TimeScaleDraw(const QTime &base): baseTime(base)
+    {
+    }
+    virtual QwtText label(double v) const
+    {
+        QTime upTime = baseTime.addSecs(60*(int)v);
+        return upTime.toString();
+    }
+private:
+    QTime baseTime;
+};
 
-//    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-//    /**
-//     * Add an item to the list of KPlotObjects to be plotted - reimplemented from kplotwidget.
-//     * @note do not use this multiple time if many objects have to be added,
-//     * addPlotObjects() is strongly suggested in this case
-//     * @param object the KPlotObject to be added
-//     */
-//    void addPlotObject( KPlotObject *object );
+class Plotter : public QGraphicsWidget
+{
+public:
+    Plotter(QGraphicsItem* parent = 0, Qt::WindowFlags wFlags = 0);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+private:
+    QwtPlot *m_plot;
+    QGraphicsLinearLayout *m_layout;
+    Plasma::Svg *m_item_background;
+};
 
-//    /**
-//     * Add more than one KPlotObject at one time - reimplemented from kplotwidget.
-//     * @param objects the list of KPlotObjects to be added
-//     */
-//    void addPlotObjects( const QList< KPlotObject* >& objects );
-
-//    void setName(QString n) {name = n;}
-//    void setInfo(QString i) {info = i; }
-//    void setLabelText(QString text);
-//    void setLimits( double x1, double x2, double y1, double y2 );
-//    QList< KPlotObject* > plotObjects() const;
-//private:
-//    QGraphicsLinearLayout *m_layout;
-//    KPlotWidget *m_plot;
-
-//    /**
-//     * adds plot to widget
-//     */
-//    void    addPlot();
-
-//    /**
-//     * configures the look of plot
-//     */
-//    void    configPlot();
-
-//    /**
-//     * placeholder function, adds arbitrary points to graph
-//     */
-//    void    addPlotPoints();
-
-//    void addInfoLabel();
-
-//    QLabel *infoLabel;
-
-//    QString name;
-//    QString info;
-
-//    Plasma::Svg *m_item_background;
-//signals:
-
-//public slots:
-
-//};
-
-//#endif // PLOTTER_H
+#endif // PLOTTER_H

@@ -2,17 +2,19 @@ set(quotesee_SRCS quotesee.cpp
     quote.cpp
     qsconfig.cpp
     qsgeneralconfig.cpp
+    plotter.cpp
 )
 
 kde4_add_ui_files(qsconfig_SRCS qsconfig.ui qsgeneralconfig.ui)
 kde4_add_plugin(plasma_applet_quotesee ${quotesee_SRCS})
-
+find_package(Qwt5)
 target_link_libraries(plasma_applet_quotesee
                       ${KDE4_PLASMA_LIBS}
                       ${KDE4_KDEUI_LIBS}
                       ${QT_QTNETWORK_LIBRARY}
                       ${QT_QTXMLPATTERNS_LIBRARY}
-                      ${KDE4_KIO_LIBS})
+                      ${KDE4_KIO_LIBS}
+                      ${Qwt5_Qt4_LIBRARY})
 
 install(TARGETS plasma_applet_quotesee
         DESTINATION ${PLUGIN_INSTALL_DIR})

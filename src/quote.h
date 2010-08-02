@@ -90,6 +90,10 @@ class Quote : public QGraphicsWidget
         double minPrice;
         double maxPrice;
 
+        Plotter *m_plotter;
+//        Plot *m_plot;
+        QGraphicsView *view;
+
     public slots:
         /**
          * @brief updated data, needed for data engine

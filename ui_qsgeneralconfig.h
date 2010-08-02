@@ -1,10 +1,10 @@
 /********************************************************************************
-** Form generated from reading ui file 'qsgeneralconfig.ui'
+** Form generated from reading UI file 'qsgeneralconfig.ui'
 **
-** Created: Wed Apr 14 21:58:02 2010
-**      by: Qt User Interface Compiler version 4.5.2
+** Created: Tue Jul 27 05:33:59 2010
+**      by: Qt User Interface Compiler version 4.7.0
 **
-** WARNING! All changes made in this file will be lost when recompiling ui file!
+** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
 #ifndef UI_QSGENERALCONFIG_H
@@ -126,7 +126,6 @@ public:
         translucentCheckBox->setText(QApplication::translate("QSGeneralConfig", "Make QuoteSee translucent", 0, QApplication::UnicodeUTF8));
         intervalGroupBox->setTitle(QApplication::translate("QSGeneralConfig", "Adjust update interval", 0, QApplication::UnicodeUTF8));
         label_3->setText(QApplication::translate("QSGeneralConfig", "Update Interval [min]", 0, QApplication::UnicodeUTF8));
-        Q_UNUSED(QSGeneralConfig);
     } // retranslateUi
 
 };
