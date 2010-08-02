@@ -25,10 +25,8 @@ Plotter::Plotter(QGraphicsItem* parent, Qt::WindowFlags wFlags)
     m_plot = new QwtPlot;
 
     m_plot->setMinimumSize(300, 250);
-//    m_plot->setmax
-//    m_plot->setPreferredSize(400, 300);
-    m_plot->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
+    m_plot->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     m_plot->setAxisScaleDraw(QwtPlot::xBottom, new TimeScaleDraw(QTime::currentTime()));        // time scale with starting point
 //    setAxisScale(QwtPlot::xBottom, AXIS_LENGHT, (double)QTime::currentTime().minute(), 1); // length of the scale
     m_plot->setAxisScale(QwtPlot::yRight, 1.39, 8.32);
@@ -108,8 +106,8 @@ stockPlot->setData(*x, *y);
 
     m_layout->addItem(form);
 
-//    m_plot->resize(350, 300);
-    resize(370, 320);
+//    resize(400, 300);
+//    m_plot->resize(400, 300);
 
 }
 void Plotter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
