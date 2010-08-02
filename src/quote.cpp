@@ -45,9 +45,7 @@ Quote::Quote(QGraphicsWidget *parent) :
         change("0"),
         m_item_background(new Plasma::Svg(this)),
         m_ext_icon(new Plasma::IconWidget(this)),
-//        m_plotter(0),
-//        ob(0),
-//        points(0),
+        m_plotter(0),
         updateNum(0),
         minPrice(0),
         maxPrice(0)
@@ -63,7 +61,6 @@ Quote::Quote(QGraphicsWidget *parent) :
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     m_plotter = new Plotter(this);
-    m_plotter->hide();
 
     // External link icon shows whe hovering over the widget
     setAcceptsHoverEvents(true);
@@ -88,6 +85,7 @@ Quote::Quote(QGraphicsWidget *parent) :
     qreal height = geometry().height();
     // show external link icon
     m_ext_icon->setPos(width - m_ext_icon->geometry().width(), (height - m_ext_icon->geometry().height())/2);
+
 }
 
 Quote::~Quote()
