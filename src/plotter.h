@@ -31,9 +31,12 @@ private:
 class Plotter : public QGraphicsWidget
 {
 public:
-    Plotter(QGraphicsItem* parent = 0, Qt::WindowFlags wFlags = 0);
+    Plotter(QGraphicsWidget *parent);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 private:
+    void addPlot();
+    void configPlot();
+    void addSampleData();
     QwtPlot *m_plot;
     QGraphicsLinearLayout *m_layout;
     Plasma::Svg *m_item_background;
