@@ -91,8 +91,6 @@ class Quote : public QGraphicsWidget
         double maxPrice;
 
         Plotter *m_plotter;
-//        Plot *m_plot;
-        QGraphicsView *view;
 
     public slots:
         /**
