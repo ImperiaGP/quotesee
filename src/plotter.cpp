@@ -16,15 +16,43 @@
 
 #include <QDebug>
 
-Plotter::Plotter(QGraphicsItem* parent, Qt::WindowFlags wFlags)
-    : QGraphicsWidget(parent, wFlags),
+Plotter::Plotter(QGraphicsWidget *parent) :
+        QGraphicsWidget(parent),
         m_plot(0),
         m_layout(0),
         m_item_background(new Plasma::Svg(this))
 {
-    m_plot = new QwtPlot;
+    addPlot();
+    configPlot();
+    addSampleData();
 
-    m_plot->setMinimumSize(300, 250);
+    resize(400, 300);
+    setLayout(m_layout);
+
+}
+
+void Plotter::addPlot()
+{
+    m_plot = new QwtPlot;
+    m_layout = new QGraphicsLinearLayout(Qt::Vertical, this);
+    m_layout->addStretch();
+
+    QGraphicsScene scene;
+    QGraphicsProxyWidget *proxy = scene.addWidget(m_plot);
+
+    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout;
+    layout->addItem(proxy);
+
+    QGraphicsWidget *form = new QGraphicsWidget;
+    form->setLayout(layout);
+
+    m_layout->addItem(form);
+
+}
+
+void Plotter::configPlot()
+{
+//    m_plot->setMinimumSize(300, 250);
 
     m_plot->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     m_plot->setAxisScaleDraw(QwtPlot::xBottom, new TimeScaleDraw(QTime::currentTime()));        // time scale with starting point
@@ -43,15 +71,19 @@ Plotter::Plotter(QGraphicsItem* parent, Qt::WindowFlags wFlags)
     m_plot->enableAxis(QwtPlot::yRight);
 //    setAxisTitle(QwtPlot::yRight, "Price");
 
+}
+
+void Plotter::addSampleData()
+{
     QwtSymbol sym;
     sym.setStyle(QwtSymbol::Ellipse);
     sym.setPen(QColor(Qt::blue));
     sym.setBrush(QColor(Qt::yellow));
     sym.setSize(5);
-
     // Insert new curves
     QwtPlotCurve *stockPlot = new QwtPlotCurve("stock");
     stockPlot->setSymbol(sym);
+
     #if QT_VERSION >= 0x040000
         stockPlot->setRenderHint(QwtPlotItem::RenderAntialiased);
     #endif
@@ -90,31 +122,18 @@ y->append(1.39);
 stockPlot->setPen(QPen(Qt::blue));
 stockPlot->attach(m_plot);
 stockPlot->setData(*x, *y);
-
-
-    m_layout = new QGraphicsLinearLayout(Qt::Vertical, this);
-    m_layout->addStretch();
-
-    QGraphicsScene scene;
-    QGraphicsProxyWidget *proxy = scene.addWidget(m_plot);
-
-    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout;
-    layout->addItem(proxy);
-
-    QGraphicsWidget *form = new QGraphicsWidget;
-    form->setLayout(layout);
-
-    m_layout->addItem(form);
-
-//    resize(400, 300);
-//    m_plot->resize(400, 300);
-
 }
+
 void Plotter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
     painter->save();
+
+    QRectF frame;
+
+    frame.setTopLeft(QPoint(0, 0));
+    frame.setSize(contentsRect().size().toSize());
 
     m_item_background->setImagePath("quotesee/itemBackground");
 
