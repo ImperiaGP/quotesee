@@ -61,6 +61,7 @@ Quote::Quote(QGraphicsWidget *parent) :
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     m_plotter = new Plotter(this);
+    m_plotter->hide();
 
     // External link icon shows whe hovering over the widget
     setAcceptsHoverEvents(true);
@@ -172,10 +173,11 @@ void Quote::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 
     frame.adjust(0, 0, -20, 0);
 
-//    m_plotter->show();
-//m_plot->show();
+    // sets position of plot to right below the widget and center
+    m_plotter->setPos(floor(mapFromParent((parentWidget()->size().width() - m_plotter->size().width())/2, 0).x()),
+                      floor(mapFromParent(0, parentWidget()->size().height()).y()));
+
     m_plotter->show();
-//    view->show();
     m_ext_icon->show();
     update();
 }
@@ -186,9 +188,6 @@ void Quote::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
     frame.adjust(0, 0, 20, 0);
 
-//    m_plotter->hide();
-//    view->hide();
-//    m_plot->hide();
     m_plotter->hide();
     m_ext_icon->hide();
     update();
