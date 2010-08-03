@@ -53,8 +53,9 @@ QuoteSee::QuoteSee(QObject *parent, const QVariantList &args) :
 
     setAspectRatioMode(Plasma::IgnoreAspectRatio);
 
-    setMinimumSize(270, 100);
-    setPreferredSize(270, 100);
+//    setMinimumSize(270, 100);
+//    setPreferredSize(270+MARGIN+MARGIN, 100);
+    resize(270, 100);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 }
 
@@ -111,9 +112,12 @@ void QuoteSee::init()
 
     m_layout = new QGraphicsLinearLayout(Qt::Vertical, this);
     m_layout->setSpacing(5);
-    m_layout->addStretch();
+//    m_layout->addStretch();
 
-    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+//    setMinimumSize(m_layout->sizeHint(Qt::PreferredSize) + QSizeF(MARGIN+MARGIN, MARGIN+MARGIN));
+//    resize(m_layout->sizeHint(Qt::PreferredSize) + QSizeF(MARGIN+MARGIN, MARGIN+MARGIN));
+
+//    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
     if(!m_code_list.isEmpty())
         paintQuotes();
@@ -140,7 +144,8 @@ void QuoteSee::constraintsEvent(Plasma::Constraints constraints)
 //        // this isn't great, research other ways to adjust size
 //        setContentsMargins(MARGIN, MARGIN, MARGIN, MARGIN);
 
-        resize(m_layout->sizeHint(Qt::PreferredSize) + QSizeF(MARGIN+MARGIN, MARGIN+MARGIN));
+//        resize(m_layout->sizeHint(Qt::PreferredSize) + QSizeF(MARGIN+MARGIN, MARGIN+MARGIN));
+//    resize(m_layout->preferredWidth(), m_layout->preferredHeight());
 //    }
 
 //    if(layout()->count() == 1)
