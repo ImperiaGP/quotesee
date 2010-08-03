@@ -58,20 +58,13 @@ Quote::Quote(QGraphicsWidget *parent) :
 
 //    points = new MRIDeque<PlotPoint>(10);
 
-    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     m_plotter = new Plotter(this);
     m_plotter->hide();
 
     // External link icon shows whe hovering over the widget
     setAcceptsHoverEvents(true);
-
-    // display content in a frame,  when mouse hovers over the widget, hoverEnterEvent happens
-    // during which frame shrinks to make space for the external link button. Frame grows to previous
-    // size when mouse leaves the widget with hoverLeaveEvent
-    frame.setTopLeft(QPoint(0, 0));
-    frame.setSize(contentsRect().size().toSize());
-    frame.adjust(10, 5, -10, -5);
 
     connect(m_ext_icon, SIGNAL(clicked()), this, SLOT(iconClicked()));
 
@@ -81,12 +74,6 @@ Quote::Quote(QGraphicsWidget *parent) :
     // icon is apparently square only
     m_ext_icon->resize(m_ext_icon->sizeFromIconSize(20));
     m_ext_icon->hide();
-
-    qreal width = geometry().width();
-    qreal height = geometry().height();
-    // show external link icon
-    m_ext_icon->setPos(width - m_ext_icon->geometry().width(), (height - m_ext_icon->geometry().height())/2);
-
 }
 
 Quote::~Quote()
@@ -99,6 +86,13 @@ void Quote::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
+
+    // display content in a frame,  when mouse hovers over the widget, hoverEnterEvent happens
+    // during which frame shrinks to make space for the external link button. Frame grows to previous
+    // size when mouse leaves the widget with hoverLeaveEvent
+    frame.setTopLeft(QPoint(0, 0));
+    frame.setSize(contentsRect().size().toSize());
+    frame.adjust(10, 5, -10, -5);
 
     m_item_background->setImagePath("quotesee/itemBackground");
 
@@ -113,7 +107,6 @@ void Quote::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
     painter->drawText(frame, Qt::AlignLeft  | Qt::AlignTop, code.toUpper());
 
     painter->drawText(frame, Qt::AlignLeft  | Qt::AlignBottom, name);
-
 
     QString schange;
     QTextStream stream(&schange);
@@ -171,11 +164,17 @@ void Quote::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     content += i18n("Last trade date: %1 ET<br />", lastTradeDate);
     content += i18n("Last trade time: %1 ET", lastTradeTime);
 
+    // show external link icon
+    qreal width = geometry().width();
+    qreal height = geometry().height();
+    m_ext_icon->setPos(width - m_ext_icon->geometry().width(), (height - m_ext_icon->geometry().height())/2);
+
     frame.adjust(0, 0, -20, 0);
 
     // sets position of plot to right below the widget and center
     m_plotter->setPos(floor(mapFromParent((parentWidget()->size().width() - m_plotter->size().width())/2, 0).x()),
                       floor(mapFromParent(0, parentWidget()->size().height()).y()));
+
 
     m_plotter->show();
     m_ext_icon->show();
