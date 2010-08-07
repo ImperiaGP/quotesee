@@ -29,6 +29,7 @@
 #include "plotter.h"
 #include "mrideque.h"
 
+class QwtPlotCurve;
 namespace Plasma
 {
   class IconWidget;
@@ -75,23 +76,36 @@ class Quote : public QGraphicsWidget
         Plasma::Svg *m_item_background;
         Plasma::IconWidget *m_ext_icon;
 
-//        Plotter *m_plotter;
+        class Coordinates
+        {
+        public:
+            /**
+             * @param point to be inserted
+             * @param axis origin
+             */
+            Coordinates(int size){axisTime = new MRIDeque<double>(size);
+                actualTime = new MRIDeque<QTime>(size);
+                values = new MRIDeque<double>(size);
+            }
+            void addCoord(QTime origin, QTime x, double y) {  actualTime->push(x);
+                                                              axisTime->push((origin.minute() % 10) + x.minute());
+                                                              values->push(y);
+                                                          }
+            MRIDeque<double> *axisTime;
+            MRIDeque<QTime> *actualTime;
+            MRIDeque<double> *values;
+        };
 
-//        KPlotObject * ob;
-//        struct PlotPoint
-//        {
-//            double axisTime;
-//            double actualTime;
-//            QString yahooTime;
-//            double price;
-//        };
-//        MRIDeque<PlotPoint> *points;
+        Coordinates *points;
+        QwtPlotCurve *stockPlot;
         int updateNum;
         double minPrice;
         double maxPrice;
 
         Plotter *m_plotter;
+        QTime axisOrigin;
 
+        void reposition(QTime axisOrigin, Coordinates *points);
     public slots:
         /**
          * @brief updated data, needed for data engine
