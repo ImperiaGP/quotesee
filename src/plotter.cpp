@@ -23,8 +23,8 @@ Plotter::Plotter(QGraphicsWidget *parent) :
         m_item_background(new Plasma::Svg(this))
 {
     addPlot();
-    configPlot();
-    addSampleData();
+//    configPlot();
+//    addSampleData();
 
     resize(400, 300);
     setLayout(m_layout);
@@ -49,16 +49,34 @@ void Plotter::addPlot()
     m_layout->addItem(form);
 
 }
+void Plotter::setAxisScaleDraw(int axisId, QwtScaleDraw *scale)
+{
+    m_plot->setAxisScaleDraw(axisId, scale);
+}
+void Plotter::setAxisScale(int axisId, double min, double max, double step)
+{
+    qDebug( ) << "setAxisScale:" << axisId << min << max << step;
+    m_plot->setAxisScale(axisId, min, max, step);
+}
+void Plotter::replot()
+{
+    m_plot->replot();
+}
 
-void Plotter::configPlot()
+void Plotter::configPlot(double min, double max, QwtScaleDraw *scale)
 {
 //    m_plot->setMinimumSize(300, 250);
 
     m_plot->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    m_plot->setAxisScaleDraw(QwtPlot::xBottom, new TimeScaleDraw(QTime::currentTime()));        // time scale with starting point
 //    setAxisScale(QwtPlot::xBottom, AXIS_LENGHT, (double)QTime::currentTime().minute(), 1); // length of the scale
-    m_plot->setAxisScale(QwtPlot::yRight, 1.39, 8.32);
     m_plot->setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignRight | Qt::AlignBottom);
+
+
+
+    m_plot->setAxisScale(QwtPlot::yRight, floor(min), ceil(max));
+    m_plot->setAxisScaleDraw(QwtPlot::xBottom, scale);
+    qDebug() << "y scale" << min << max;
+
 
     QwtScaleWidget *scaleWidget = m_plot->axisWidget(QwtPlot::xBottom);
     const int fmh = QFontMetrics(scaleWidget->font()).height();
@@ -72,6 +90,24 @@ void Plotter::configPlot()
 //    setAxisTitle(QwtPlot::yRight, "Price");
 
 }
+void Plotter::addGraph(const QVector<double> &x, const QVector<double> &y)
+{
+    QwtSymbol sym;
+    sym.setStyle(QwtSymbol::Ellipse);
+    sym.setPen(QColor(Qt::blue));
+    sym.setBrush(QColor(Qt::yellow));
+    sym.setSize(5);
+    // Insert new curves
+    stockPlot = new QwtPlotCurve("stock");
+    stockPlot->setSymbol(sym);
+
+    stockPlot->detach();
+
+    stockPlot->setPen(QPen(Qt::blue));
+    stockPlot->attach(m_plot);
+
+    stockPlot->setData(x, y);
+}
 
 void Plotter::addSampleData()
 {
@@ -81,14 +117,20 @@ void Plotter::addSampleData()
     sym.setBrush(QColor(Qt::yellow));
     sym.setSize(5);
     // Insert new curves
-    QwtPlotCurve *stockPlot = new QwtPlotCurve("stock");
+    stockPlot = new QwtPlotCurve("stock");
     stockPlot->setSymbol(sym);
+
+
+    m_plot->setAxisScale(QwtPlot::yRight, 1.39, 8.32);
+    m_plot->setAxisScaleDraw(QwtPlot::xBottom, new TimeScaleDraw(QTime::currentTime()));        // time scale with starting point
 
     #if QT_VERSION >= 0x040000
         stockPlot->setRenderHint(QwtPlotItem::RenderAntialiased);
     #endif
 
     QTime now = QTime::currentTime();
+
+
     QVector<double> *x = new QVector<double>();
 QTime temp;
 
