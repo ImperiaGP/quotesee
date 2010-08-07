@@ -54,7 +54,7 @@ QuoteSee::QuoteSee(QObject *parent, const QVariantList &args) :
     setAspectRatioMode(Plasma::IgnoreAspectRatio);
 
 //    setMinimumSize(270, 100);
-//    setPreferredSize(270+MARGIN+MARGIN, 100);
+
     resize(270, 100);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 }
