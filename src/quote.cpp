@@ -30,6 +30,8 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 
+#include <qwt-qt4/qwt_plot_curve.h>
+
 //#include "plotting/kplotobject.h"
 //#include "plotting/kplotpoint.h"
 
@@ -53,15 +55,14 @@ Quote::Quote(QGraphicsWidget *parent) :
     setMinimumHeight(55);
     setMaximumHeight(55);
     setMinimumWidth(270);
-    // Tooltips display time and date of last trade
-//    Plasma::ToolTipManager::self()->registerWidget(this);
-
-//    points = new MRIDeque<PlotPoint>(10);
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
+    points = new Coordinates(10);
     m_plotter = new Plotter(this);
     m_plotter->hide();
+
+    stockPlot = new QwtPlotCurve("stock");
 
     // External link icon shows whe hovering over the widget
     setAcceptsHoverEvents(true);
@@ -74,6 +75,13 @@ Quote::Quote(QGraphicsWidget *parent) :
     // icon is apparently square only
     m_ext_icon->resize(m_ext_icon->sizeFromIconSize(20));
     m_ext_icon->hide();
+
+    // display content in a frame,  when mouse hovers over the widget, hoverEnterEvent happens
+    // during which frame shrinks to make space for the external link button. Frame grows to previous
+    // size when mouse leaves the widget with hoverLeaveEvent
+    frame.setTopLeft(QPoint(0, 0));
+    frame.setSize(contentsRect().size().toSize());
+    frame.adjust(10, 5, -10, -5);
 }
 
 Quote::~Quote()
@@ -86,13 +94,6 @@ void Quote::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
-
-    // display content in a frame,  when mouse hovers over the widget, hoverEnterEvent happens
-    // during which frame shrinks to make space for the external link button. Frame grows to previous
-    // size when mouse leaves the widget with hoverLeaveEvent
-    frame.setTopLeft(QPoint(0, 0));
-    frame.setSize(contentsRect().size().toSize());
-    frame.adjust(10, 5, -10, -5);
 
     m_item_background->setImagePath("quotesee/itemBackground");
 
@@ -171,13 +172,14 @@ void Quote::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 
     frame.adjust(0, 0, -20, 0);
 
+
     // sets position of plot to right below the widget and center
-    m_plotter->setPos(floor(mapFromParent((parentWidget()->size().width() - m_plotter->size().width())/2, 0).x()),
-                      floor(mapFromParent(0, parentWidget()->size().height()).y()));
+    m_plotter->setPos(mapFromParent((parentWidget()->size().width() - m_plotter->size().width())/2, 0).x(),
+                      mapFromParent(0, parentWidget()->size().height()).y());
 
 
-    m_plotter->show();
     m_ext_icon->show();
+    m_plotter->show();
     update();
 }
 
@@ -197,6 +199,8 @@ void Quote::dataUpdated(const QString &source, const Plasma::DataEngine::Data &d
 {
     Q_UNUSED(source);
 
+    static int numUpdates = 0;
+
     qDebug("[%s:%i] %s()",
            ((strrchr(__FILE__, '/') ? : __FILE__ - 1) + 1),
            __LINE__,
@@ -204,9 +208,10 @@ void Quote::dataUpdated(const QString &source, const Plasma::DataEngine::Data &d
 
     kDebug() << __LINE__ << "************************update:" << updateNum;
 
-
     if(!data.empty())
     {
+
+        // GRAB DATA //
         code          = source;
         status        = (Status)data["status"].toInt();
         name          = data["name"].toString();
@@ -214,7 +219,74 @@ void Quote::dataUpdated(const QString &source, const Plasma::DataEngine::Data &d
         change        = data["change"    ].toString();
         lastTradeTime = data["last_trade_time"].toString();
         lastTradeDate = data["last_trade_date"].toString();
+        // END GRAB DATA //
 
+        // IS FIRST UPDATE //
+        QTime lttime = QTime::fromString(lastTradeTime, "h:mmap");
+
+        // initial max/min price is just the first value from server
+        if(updateNum == 0)
+        {
+            minPrice = lastTrade.toDouble();
+            maxPrice = lastTrade.toDouble();
+            axisOrigin = lttime;
+
+            qDebug() << "AXIS ORIGIN:" << axisOrigin;
+        }
+        qDebug() << "LTTIME: " << lttime;
+        // END IS FIRST UPDATE //
+
+        // FIND MIN/MAX Y //
+        // find max and min values in queue
+//            foreach(double value, points->values)
+            for(int i = 0; i < points->values->count(); i++)
+        {
+            if(points->values->at(i) < minPrice)
+            {
+                minPrice = points->values->at(i);
+//                    kDebug() << __LINE__ << "minPrice: " << minPrice;
+            }
+            if(points->values->at(i) > maxPrice)
+            {
+                maxPrice = points->values->at(i);
+//                    kDebug() << __LINE__ <<  "maxPrice" << maxPrice;
+            }
+        }
+        // END FIND MIN/MAX Y //
+        // SET Y AXIS RANGE //
+//        m_plotter->setAxisScale(QwtPlot::yRight, floor(minPrice), ceil(maxPrice));
+            m_plotter->configPlot(minPrice, maxPrice, new TimeScaleDraw(axisOrigin));
+            qDebug() << "1 setting y range:" << floor(minPrice) << ceil(maxPrice) << "scale:" << axisOrigin.toString();
+        // END SET Y AXIS RANGE //
+
+        // IS PREVIOUS POINT AT THE SAME X COORDINATE //
+        // should be safe, if deque empty, it won't check the second condition
+        // don't add a point if previous time is the same, i.e. data did not change
+        if((points->axisTime->empty()) || (points->actualTime->at(0) != lttime))
+        {
+            points->addCoord(axisOrigin, lttime, lastTrade.toDouble());
+//                kDebug() << __LINE__ << "pushing point" << pt.axisTime << pt.price;
+
+
+
+            // IS POINT COUNT == 10 //
+            if(points->values->count() == 1)
+            {
+                axisOrigin = lttime;
+                kDebug() << "resetting update number, scale: " << lttime;
+                reposition(axisOrigin, points);
+                // MOVE AXIS ORIGIN //
+//                m_plotter->setAxisScaleDraw(QwtPlot::xBottom, new TimeScaleDraw(axisOrigin));
+                m_plotter->configPlot(minPrice, maxPrice, new TimeScaleDraw(axisOrigin));
+                qDebug() << "2 min/max:" << minPrice << maxPrice << "x scale: " << axisOrigin.toString();
+                // END MOVE AXIS ORIGIN //
+//                updateNum = 1;
+            }
+            // END IS POINT COUNT == 10 //
+
+            m_plotter->addGraph(points->axisTime->toVector(), points->values->toVector());
+        }
+        // END SAME X COORDINATE CHECK
 
     qDebug("  -> %s | %s | %s | %s | %s | %s\n",
            code.toLatin1().data(),
@@ -224,11 +296,29 @@ void Quote::dataUpdated(const QString &source, const Plasma::DataEngine::Data &d
            lastTradeTime.toLatin1().data(),
            lastTradeDate.toLatin1().data());
 
-    //////////////////////////////////
-            QTime time = QTime::fromString(lastTradeTime, "h:mmap");
+    qDebug() << "points";
+    for(int i = 0; i < points->axisTime->count(); i++)
+     {
+         qDebug() << "  ->(" << points->actualTime->at(i) << points->axisTime->at(i) << ", " << points->values->at(i) << ")";
+     }
+
+
 
     }
+    m_plotter->replot();
     updateNum++;
     update();
     kDebug() << __LINE__ << "************************update";
+}
+
+void Quote::reposition(QTime axisOrigin, Coordinates *points)
+{
+    points->axisTime->clear();
+    qDebug() << "repoisitioned: ";
+
+    for(int i = 0; i < points->axisTime->count(); i++)
+    {
+        points->axisTime->push((axisOrigin.minute() % 10) + points->actualTime->at(i).minute());
+        qDebug() << (axisOrigin.minute() % 10) + points->actualTime->at(i).minute();
+    }
 }
