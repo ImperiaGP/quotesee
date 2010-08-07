@@ -12,6 +12,7 @@
 #include <Plasma/Svg>
 
 class QGraphicsLinearLayout;
+class QwtPlotCurve;
 
 class TimeScaleDraw: public QwtScaleDraw
 {
@@ -33,10 +34,16 @@ class Plotter : public QGraphicsWidget
 public:
     Plotter(QGraphicsWidget *parent);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+    void setAxisScaleDraw(int axisId, QwtScaleDraw *);
+    void setAxisScale(int axisId, double min, double max, double step = 0);
+    void addGraph(const QVector<double> &x, const QVector<double> &y);
+    void configPlot(double min = 0, double max = 0, QwtScaleDraw *scale = new TimeScaleDraw(QTime::currentTime()));
+    void replot();
 private:
     void addPlot();
-    void configPlot();
     void addSampleData();
+    QwtPlotCurve *stockPlot;
     QwtPlot *m_plot;
     QGraphicsLinearLayout *m_layout;
     Plasma::Svg *m_item_background;
