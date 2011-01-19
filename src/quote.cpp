@@ -228,12 +228,120 @@ void Quote::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     m_plotter->hide();
     update();
 }
+double Quote::toAxisTime(QTime val)
+{
+    int h = val.hour();
+//    int m = int(10000 * (val + 0.005 - h)/60);
+    int m = 10*val.minute()/60;
+    qDebug() << "<----------------- TO AXIS TIME" << val.toString() << h << m;
+
+    return (double)h + (double)m/100;
+}
+void Quote::makeNewPlot()
+{
+    QTime time = QTime::fromString(lastTradeTime, "h:mmap");
+
+    PlotPoint pt;
+    pt.actualTime = (double)time.hour() + ((double)time.minute())/100;
+    pt.axisTime = toAxisTime(time);
+    pt.yahooTime = lastTradeTime;
+    pt.price = lastTrade.toDouble();
+
+
+
+//            kDebug() << __LINE__ << "points is:" << pt.axisTime << pt.price;
+//            kDebug() << __LINE__ << "actual time:" << lastTradeTime;
+
+    // should be safe, if deque empty, it won't check the second condition
+    if((points->empty()) || (points->at(0).axisTime != pt.axisTime))
+    {
+//                kDebug() << __LINE__ << "pushing point" << pt.axisTime << pt.price;
+        points->push(pt);
+    }
+    else{
+//                kDebug() << __LINE__ << "data unchanged since last update";
+    }
+
+    // print contents of deque
+    qDebug() << points->count() << "-points-";
+
+    qDebug() <<  QString("%1%2%3%4").arg("actual", -10)
+                                    .arg("axis", -10)
+                                    .arg("yahoo", -10)
+                                    .arg("price", -10);
+    foreach(PlotPoint p, *points)
+    {
+        qDebug() << QString("%1%2%3%4").arg(QString::number(p.actualTime, 'f', 2), -10)
+                                       .arg(QString::number(p.axisTime, 'f', 2), -10)
+                                       .arg(p.yahooTime,-10)
+                                       .arg(p.price, -10);
+    }
+
+    if(updateNum == 0)
+    {
+        minPrice = pt.price;
+        maxPrice = pt.price;
+    }
+
+    // above will only run for the first update
+    if(updateNum % 5 == 0 && updateNum != 1)
+    {
+        // resetting update number
+        updateNum = 1;
+    }
+
+    // find max and min values in queue
+    foreach(PlotPoint p, *points)
+    {
+        if(p.price < minPrice)
+        {
+            minPrice = p.price;
+//                    kDebug() << __LINE__ << "minPrice: " << minPrice;
+        }
+        if(p.price > maxPrice)
+        {
+            maxPrice = p.price;
+//                    kDebug() << __LINE__ <<  "maxPrice" << maxPrice;
+        }
+    }
+    qDebug() << __LINE__ << "minPrice:" << minPrice << "maxPrice:" << maxPrice;
+    qDebug() << __LINE__ << "minTime :" << points->last().actualTime
+             << "maxTime" << points->first().actualTime;
+
+    // get max and min time from queue
+
+    // each update paint points from queue, makes it easier to maintain
+    ob->clearPoints();
+
+//            kDebug() << "points cleared";
+
+    if(points->count() > 1)
+    {
+
+        /* axis limites */
+        m_plotter->setLimits(points->last().actualTime-0.06, points->first().actualTime+0.03, minPrice-0.05, maxPrice+0.05);
+        qDebug() << "[LIMITS]:"<< points->last().actualTime << points->first().actualTime;
+
+        foreach(PlotPoint p, *points)
+        {
+//                    kDebug() << "adding point to graph:" << "[" << p.actualTime << "]" << p.axisTime << p.price;
+            ob->addPoint(p.actualTime, p.price, QString::number(p.actualTime, 'f', 2));
+        }
+    }
+
+//    qDebug() << "plot points:";
+//    foreach( KPlotObject *po, m_plotter->plotObjects() ) {
+//        foreach( KPlotPoint *p, po->points() ) {
+//            qDebug() << "(" << p->x() << "," << p->y() << ")";
+//        }
+//    }
+}
 
 void Quote::dataUpdated(const QString &source, const Plasma::DataEngine::Data &data)
 {
     Q_UNUSED(source);
 
-    qDebug("[%s:%i] %s()",
+    qDebug("\n[%s:%i] %s()",
            ((strrchr(__FILE__, '/') ? : __FILE__ - 1) + 1),
            __LINE__,
            __FUNCTION__);
@@ -271,122 +379,9 @@ void Quote::dataUpdated(const QString &source, const Plasma::DataEngine::Data &d
            lastTradeTime.toLatin1().data(),
            lastTradeDate.toLatin1().data());
 
+    makeNewPlot();
     //////////////////////////////////
-            QTime time = QTime::fromString(lastTradeTime, "h:mmap");
 
-            PlotPoint pt;
-            pt.actualTime = (double)time.hour() + ((double)time.minute())/100;
-//            qDebug() << "actual:   " << (double)time.hour() << ((double)time.minute()) << ((double)time.minute())/100;
-            pt.axisTime = (double)time.hour() + ((double)time.minute())/60;
-//            qDebug() << "axis: " << (double)time.hour() << ((double)time.minute()) << ((double)time.minute())/60;
-            pt.yahooTime = lastTradeTime;
-            pt.price = lastTrade.toDouble();
-
-
-
-//            kDebug() << __LINE__ << "points is:" << pt.axisTime << pt.price;
-//            kDebug() << __LINE__ << "actual time:" << lastTradeTime;
-
-            // should be safe, if deque empty, it won't check the second condition
-            if((points->empty()) || (points->at(0).axisTime != pt.axisTime))
-            {
-//                kDebug() << __LINE__ << "pushing point" << pt.axisTime << pt.price;
-                points->push(pt);
-            }
-            else{
-//                kDebug() << __LINE__ << "data unchanged since last update";
-            }
-
-            // print contents of deque
-            qDebug() << points->count() << "points";
-            qDebug() <<  "actual" << "\t" << "axis" << "\t\t" << "label" << "\t\t" << "yahoo" /*<< "\t\t" << "price"*/;
-            foreach(PlotPoint p, *points)
-            {
-
-                int h = int(p.axisTime);
-                int m = int( 60.*(p.axisTime - h) );
-                double d = 60.*(p.actualTime - h);
-                int dd = 60.*(p.axisTime - h);
-
-//                qDebug() << "h:"<< QString::number(h) << "m:"<< QString::number(m)
-//                       << "p.actualTime - h" << QString::number(d)
-//                       << "60.*(p.actualTime - h) )" << dd;
-
-                qDebug() << QString::number(p.actualTime, 'f', 2)/* +
-                            QString("(") +
-                            QString::number(d) +
-                            QString(")") +
-                            QString("(") +
-                            QString::number(dd) +
-                            QString(")") +
-                            QString("(") +
-                            QString::number(p.actualTime - h) +
-                            QString(")")*/
-                            << "\t\t" << QString::number(p.axisTime, 'f', 4)
-                            << "\t" << QString( "%1:%2" ).arg( h, 2, 10, QLatin1Char('0') ).arg( m, 2, 10, QLatin1Char('0') )
-                            << "\t" << p.yahooTime;
-//                          << "\t" << QString::number(p.price, 'f', 4);
-            }
-
-            if(updateNum == 0)
-            {
-                minPrice = pt.price;
-                maxPrice = pt.price;
-//                kDebug() << __LINE__ << "max/min price:" << maxPrice << "/" << minPrice;
-            }
-
-            // above will only run for the first update
-            if(updateNum % 5 == 0 && updateNum != 1)
-            {
-//                kDebug() << __LINE__ << "resetting update number";
-                updateNum = 1;
-            }
-
-            // find max and min values in queue
-            foreach(PlotPoint p, *points)
-            {
-                if(p.price < minPrice)
-                {
-                    minPrice = p.price;
-//                    kDebug() << __LINE__ << "minPrice: " << minPrice;
-                }
-                if(p.price > maxPrice)
-                {
-                    maxPrice = p.price;
-//                    kDebug() << __LINE__ <<  "maxPrice" << maxPrice;
-                }
-            }
-            qDebug() << __LINE__ << "minPrice:" << minPrice << "maxPrice:" << maxPrice;
-            qDebug() << __LINE__ << "minTime :" << points->last().axisTime
-                     << "maxTime" << points->first().axisTime;
-
-            // get max and min time from queue
-
-            // each update paint points from queue, makes it easier to maintain
-            ob->clearPoints();
-
-//            kDebug() << "points cleared";
-
-            if(points->count() > 1)
-            {
-//                kDebug() << __LINE__ << "point count:" << points->count();
-//                kDebug() << __LINE__ << "scale:" << points->last().axisTime << points->first().axisTime
-//                         << maxPrice << minPrice;
-                m_plotter->setLimits(points->last().axisTime, points->first().axisTime, minPrice, maxPrice);
-
-                foreach(PlotPoint p, *points)
-                {
-//                    kDebug() << "adding point to graph:" << "[" << p.actualTime << "]" << p.axisTime << p.price;
-                    ob->addPoint(p.axisTime, p.price/*, QString::number(p.price, 'f', 2)*/);
-                }
-            }
-
-            qDebug() << "plot points:";
-            foreach( KPlotObject *po, m_plotter->plotObjects() ) {
-                foreach( KPlotPoint *p, po->points() ) {
-                    qDebug() << "(" << p->x() << "," << p->y() << ")";
-                }
-            }
     }
     updateNum++;
     update();
