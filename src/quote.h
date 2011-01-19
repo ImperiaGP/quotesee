@@ -85,6 +85,8 @@ class Quote : public QGraphicsWidget
             QString yahooTime;
             double price;
         };
+        double toAxisTime(QTime val);
+        void makeNewPlot();
         MRIDeque<PlotPoint> *points;
         int updateNum;
         double minPrice;
