@@ -42,12 +42,12 @@ QuoteSee::QuoteSee(QObject *parent, const QVariantList &args) :
     m_polling_interval(UNIT_INTERVAL),
     m_translucent(true)
 {
-//#if !defined(NO_DEBUG_TO_FILE)
-//    qInstallMsgHandler(qsDebug::debugOutput);
-//#endif
+#if !defined(NO_DEBUG_TO_FILE)
+    qInstallMsgHandler(qsDebug::debugOutput);
+#endif
 
     qDebug("\n\n-------------------\nQuoteSee instance start\n-------------------");
-
+    qDebug() << "compiled:" << __DATE__ << __TIME__;
     qDebug() << "size on start: " << this->size().width() << this->size().height();
     setHasConfigurationInterface(true);
 
