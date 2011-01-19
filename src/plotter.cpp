@@ -13,7 +13,6 @@
 #include <QtGui>
 #include <QLabel>
 
-#include "axisscale.h"
 
 using namespace::std;
 
@@ -127,21 +126,13 @@ QList< KPlotObject* > Plotter::plotObjects() const
 
 void Plotter::setLimits( double x1, double x2, double y1, double y2 )
 {
-    double inc;
+//    double inc;
 
-    double *yp1 = &y1, *yp2 = &y2;
-    double *xp1 = &x1, *xp2 = &x2;
+//    double *yp1 = &y1, *yp2 = &y2;
+//    double *xp1 = &x1, *xp2 = &x2;
+//    AxisScale::DefineAxis(yp1, yp2, &inc);
 
-//    *xp1 = *xp1 - (0.02);
-//    *xp2 = *xp2 + (0.02);
-//    *yp1 = *yp1 - 0.02;
-//    *yp2 = *yp2 + 0.02;
-    kDebug() << "[scale]:" << x1 << x2 << *yp1 << *yp2;
-    AxisScale::DefineAxis(yp1, yp2, &inc);
-//    AxisScale::DefineAxis(x1, x2, &inc);
-
-//    qDebug() << "[adjusted scale]:" << *xp1 << *xp2 << *yp1 << *yp2;
-    m_plot->setLimits(x1, x2, *yp1, *yp2);
+    m_plot->setLimits(x1, x2, y1, y2);
 //    kDebug() << "major tick marks:" << m_plot->axis(KPlotWidget::BottomAxis)->majorTickMarks();
 //    m_plot->setLimits(floor(*xp1), ceil(*xp2), floor(*yp1), ceil(*yp2));
 }
