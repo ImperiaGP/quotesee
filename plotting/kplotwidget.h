@@ -21,7 +21,7 @@
 #ifndef KPLOTWIDGET_H
 #define KPLOTWIDGET_H
 
-#include <kdeui_export.h>
+//#include <kdeui_export.h>
 
 #include <QtGui/QFrame>
 #include <QtCore/QList>
@@ -35,22 +35,22 @@ class KPlotPoint;
  *
  *@short Generic data plotting widget.
  *
- *Widget for drawing plots. The basic idea behind KPlotWidget is that 
- *you don't have to worry about any transformation from your data's 
+ *Widget for drawing plots. The basic idea behind KPlotWidget is that
+ *you don't have to worry about any transformation from your data's
  *natural units to screen pixel coordinates; this is handled internally
- *by the widget.  
+ *by the widget.
  *
- *Data to be plotted are represented by one or more instances of 
- *KPlotObject.  KPlotObject contains a list of QPointFs to be plotted 
- *(again, in the data's natural units), as well as information about how 
- *the data are to be rendered in the plot (i.e., as separate points or 
- *connected by lines?  With what color and point style? etc).  See 
+ *Data to be plotted are represented by one or more instances of
+ *KPlotObject.  KPlotObject contains a list of QPointFs to be plotted
+ *(again, in the data's natural units), as well as information about how
+ *the data are to be rendered in the plot (i.e., as separate points or
+ *connected by lines?  With what color and point style? etc).  See
  *KPlotObject for more information.
  *
- *KPlotWidget automatically adds axis labels with tickmarks and tick 
- *labels.  These are encapsulated in the KPlotAxis class.  All you have 
- *to do is set the limits of the plotting area in data units, and 
- *KPlotWidget wil figure out the optimal positions and labels for the 
+ *KPlotWidget automatically adds axis labels with tickmarks and tick
+ *labels.  These are encapsulated in the KPlotAxis class.  All you have
+ *to do is set the limits of the plotting area in data units, and
+ *KPlotWidget wil figure out the optimal positions and labels for the
  *tickmarks on the axes.
  *
  *Example of usage:
@@ -71,7 +71,7 @@ kpw->addPlotObject( kpo );
  * @endcode
  *
  *@note KPlotWidget will take care of the objects added to it, so when
- *clearing the objects list (eg with removeAllPlotObjects()) any previous 
+ *clearing the objects list (eg with removeAllPlotObjects()) any previous
  *reference to a KPlotObject already added to a KPlotWidget will be invalid.
  *
  *@author Jason Harris
@@ -131,18 +131,18 @@ public:
     void setLimits( double x1, double x2, double y1, double y2 );
 
     /**
-     * @short Reset the secondary data limits, which control the 
+     * @short Reset the secondary data limits, which control the
      * values displayed along the top and right axes.
-     * 
-     * All data points are *plotted* using the coordinates 
-     * defined by setLimits(), so this function is only useful for 
-     * showing alternate tickmark labels along the top and right 
-     * edges.  For example, if you were plotting temperature on the 
-     * X-axis, you could use Centigrade units for the primary 
+     *
+     * All data points are *plotted* using the coordinates
+     * defined by setLimits(), so this function is only useful for
+     * showing alternate tickmark labels along the top and right
+     * edges.  For example, if you were plotting temperature on the
+     * X-axis, you could use Centigrade units for the primary
      * (bottom) axis, using setLimits( 0.0, 100.0, 0.0, 1.0 ).  If
-     * you also wanted to show Farenheit units along the secondary 
-     * (top) axis, you would additionally use 
-     * setSecondaryLimits( 32.0, 212.0, 0.0, 1.0 ).  The data 
+     * you also wanted to show Farenheit units along the secondary
+     * (top) axis, you would additionally use
+     * setSecondaryLimits( 32.0, 212.0, 0.0, 1.0 ).  The data
      * added to the plot would have x-coordinates in Centigrade degrees.
      *
      * @param x1 the minimum X value in secondary data units
@@ -154,29 +154,29 @@ public:
     void setSecondaryLimits( double x1, double x2, double y1, double y2 );
 
     /**
-     * Unset the secondary limits, so the top and right axes 
+     * Unset the secondary limits, so the top and right axes
      * show the same tickmarks as the bottom and left axes (no tickmark
      * labels will be drawn for the top and right axes in this case)
      */
     void clearSecondaryLimits();
 
     /**
-     * @return the rectangle representing the boundaries of the current plot, 
+     * @return the rectangle representing the boundaries of the current plot,
      * in natural data units.
      * @sa setLimits()
      */
     QRectF dataRect() const;
 
     /**
-     * @return the rectangle representing the boundaries of the secondary 
-     * data limits, if they have been set.  Otherwise, this function 
+     * @return the rectangle representing the boundaries of the secondary
+     * data limits, if they have been set.  Otherwise, this function
      * behaves the same as dataRect().
      * @sa setSecondaryLimits()
      */
     QRectF secondaryDataRect() const;
 
     /**
-     * @return the rectangle representing the boundaries of the current plot, 
+     * @return the rectangle representing the boundaries of the current plot,
      * in screen pixel units.
       */
     QRect pixRect() const;
@@ -206,7 +206,7 @@ public:
     void removeAllPlotObjects();
 
     /**
-     * Reset the mask used for non-overlapping labels so that all 
+     * Reset the mask used for non-overlapping labels so that all
      * regions of the plot area are considered empty.
      */
     void resetPlotMask();
@@ -290,32 +290,32 @@ public:
     /**
      * @return the number of pixels to the left of the plot area.
      *
-     * Padding values are set to -1 by default; if unchanged, this 
-     * function will try to guess a good value, based on whether 
+     * Padding values are set to -1 by default; if unchanged, this
+     * function will try to guess a good value, based on whether
      * ticklabels and/or axis labels need to be drawn.
      */
     int leftPadding() const;
 
     /**
      * @return the number of pixels to the right of the plot area.
-     * Padding values are set to -1 by default; if unchanged, this 
-     * function will try to guess a good value, based on whether 
+     * Padding values are set to -1 by default; if unchanged, this
+     * function will try to guess a good value, based on whether
      * ticklabels and/or axis labels are to be drawn.
      */
     int rightPadding() const;
 
     /**
      * @return the number of pixels above the plot area.
-     * Padding values are set to -1 by default; if unchanged, this 
-     * function will try to guess a good value, based on whether 
+     * Padding values are set to -1 by default; if unchanged, this
+     * function will try to guess a good value, based on whether
      * ticklabels and/or axis labels are to be drawn.
      */
     int topPadding() const;
 
     /**
      * @return the number of pixels below the plot area.
-     * Padding values are set to -1 by default; if unchanged, this 
-     * function will try to guess a good value, based on whether 
+     * Padding values are set to -1 by default; if unchanged, this
+     * function will try to guess a good value, based on whether
      * ticklabels and/or axis labels are to be drawn.
      */
     int bottomPadding() const;
@@ -345,13 +345,13 @@ public:
     void setBottomPadding( int padding );
 
     /**
-     * @short Revert all four padding values to -1, so that they will be 
+     * @short Revert all four padding values to -1, so that they will be
      * automatically determined.
      */
     void setDefaultPaddings();
 
     /**
-     * @short Map a coordinate @param p from the data rect to the physical 
+     * @short Map a coordinate @param p from the data rect to the physical
      * pixel rect.
      * Used mainly when drawing.
      * @param p the point to be converted, in natural data units
@@ -360,20 +360,20 @@ public:
     QPointF mapToWidget( const QPointF& p ) const;
 
     /**
-     * Indicate that object labels should try to avoid the given 
+     * Indicate that object labels should try to avoid the given
      * rectangle in the plot.  The rectangle is in pixel coordinates.
      *
      * @note You should not normally call this function directly.
      * It is called by KPlotObject when points, bars and labels are drawn.
-     * @param r the rectangle defining the region in the plot that 
+     * @param r the rectangle defining the region in the plot that
      * text labels should avoid (in pixel coordinates)
-     * @param value Allows you to determine how strongly the rectangle 
+     * @param value Allows you to determine how strongly the rectangle
      * should be avoided.  Larger values are avoided more strongly.
      */
     void maskRect( const QRectF &r, float value=1.0 );
 
     /**
-     * Indicate that object labels should try to avoid the line 
+     * Indicate that object labels should try to avoid the line
      * joining the two given points (in pixel coordinates).
      *
      * @note You should not normally call this function directly.
@@ -387,9 +387,9 @@ public:
 
     /**
      * Place an object label optimally in the plot.  This function will
-     * attempt to place the label as close as it can to the point to which 
-     * the label belongs, while avoiding overlap with regions of the plot 
-     * that have been masked. 
+     * attempt to place the label as close as it can to the point to which
+     * the label belongs, while avoiding overlap with regions of the plot
+     * that have been masked.
      *
      * @note You should not normally call this function directly.
      * It is called internally in KPlotObject::draw().
@@ -452,7 +452,7 @@ protected:
     virtual void drawAxes( QPainter *p );
 
     /**
-     * Synchronize the PixRect with the current widget size and 
+     * Synchronize the PixRect with the current widget size and
      * padding settings.
      */
     void setPixRect();
@@ -463,6 +463,13 @@ protected:
      * @param p The screen position from which to check for plot points.
      */
     QList<KPlotPoint*> pointsUnderPoint( const QPoint& p ) const;
+
+
+    /**
+     * @return a coordinate in axis units
+     * @param val time value to be translated
+     */
+    qreal toAxisTime(qreal val) const;
 
 private:
     class Private;

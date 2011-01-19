@@ -21,7 +21,7 @@
 #ifndef KPLOTAXIS_H
 #define KPLOTAXIS_H
 
-#include <kdeui_export.h>
+//#include <kdeui_export.h>
 
 #include <QtCore/QString>
 #include <QtCore/QList>
@@ -90,7 +90,7 @@ public:
     QString tickLabel( double value ) const;
 
     /**
-     * Set the display format for converting the double value of the 
+     * Set the display format for converting the double value of the
      * tick's position to the QString for the tick label.
      *
      * Normally, the format character is one of 'e', 'E', 'f', 'g', or 'G'
@@ -102,9 +102,9 @@ public:
      * Note that when the format character is 't', the fieldWidth and prec
      * values are ignored.
      *
-     * @param format the format specification character 
+     * @param format the format specification character
      * @param fieldWidth the number of characters in the output string.
-     * If set to 0, the string will be as wide as it needs to be to fully 
+     * If set to 0, the string will be as wide as it needs to be to fully
      * render the value.
      * @param precision the number of characters following the decimal point.
      */
@@ -127,7 +127,7 @@ public:
 
     /**
      * Determine the positions of major and minor tickmarks for this axis.
-     * @note this function is called by KPlotWidget whenever the plot's 
+     * @note this function is called by KPlotWidget whenever the plot's
      * limits are modified.
      * @param x0 the minimum data coordinate of the axis.
      * @param length the range covered by the axis, in data units.

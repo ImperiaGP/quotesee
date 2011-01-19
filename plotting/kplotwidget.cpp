@@ -19,10 +19,10 @@
 */
 
 #include "kplotwidget.h"
-#include "kplotwidget.moc"
+//#include "kplotwidget.moc"
 
 #include <math.h>
-#include <kdebug.h>
+#include <QDebug>
 
 #include <QtGui/QActionEvent>
 #include <QHash>
@@ -72,10 +72,10 @@ public:
 
     void calcDataRectLimits( double x1, double x2, double y1, double y2 );
     /**
-     * @return a value indicating how well the given rectangle is 
-     * avoiding masked regions in the plot.  A higher returned value 
-     * indicates that the rectangle is intersecting a larger portion 
-     * of the masked region, or a portion of the masked region which 
+     * @return a value indicating how well the given rectangle is
+     * avoiding masked regions in the plot.  A higher returned value
+     * indicates that the rectangle is intersecting a larger portion
+     * of the masked region, or a portion of the masked region which
      * is weighted higher.
      * @param r The rectangle to be tested
      */
@@ -147,11 +147,11 @@ void KPlotWidget::Private::calcDataRectLimits( double x1, double x2, double y1, 
     else { YA1=y1; YA2=y2; }
 
     if ( XA2 == XA1 ) {
-        kWarning() << "x1 and x2 cannot be equal. Setting x2 = x1 + 1.0";
+        qWarning() << "x1 and x2 cannot be equal. Setting x2 = x1 + 1.0";
         XA2 = XA1 + 1.0;
     }
     if ( YA2 == YA1 ) {
-        kWarning() << "y1 and y2 cannot be equal. Setting y2 = y1 + 1.0";
+        qWarning() << "y1 and y2 cannot be equal. Setting y2 = y1 + 1.0";
         YA2 = YA1 + 1.0;
     }
     dataRect = QRectF( XA1, YA1, XA2 - XA1, YA2 - YA1 );
@@ -174,11 +174,11 @@ void KPlotWidget::setSecondaryLimits( double x1, double x2, double y1, double y2
     else { YA1=y1; YA2=y2; }
 
     if ( XA2 == XA1 ) {
-        kWarning() << "x1 and x2 cannot be equal. Setting x2 = x1 + 1.0";
+        qWarning() << "x1 and x2 cannot be equal. Setting x2 = x1 + 1.0";
         XA2 = XA1 + 1.0;
     }
     if ( YA2 == YA1 ) {
-        kWarning() << "y1 and y2 cannot be equal. Setting y2 = y1 + 1.0";
+        qWarning() << "y1 and y2 cannot be equal. Setting y2 = y1 + 1.0";
         YA2 = YA1 + 1.0;
     }
     d->secondDataRect = QRectF( XA1, YA1, XA2-XA1, YA2-YA1 );
@@ -402,6 +402,13 @@ void KPlotWidget::setPixRect() {
     d->pixRect = QRect( 0, 0, newWidth, newHeight );
 }
 
+qreal KPlotWidget::toAxisTime(qreal val) const
+{
+    int h = int(val);
+    int m = int(10000 * (val + 0.005 - h)/60);
+    return (qreal)h + (qreal)m/100;
+}
+
 QPointF KPlotWidget::mapToWidget( const QPointF& p ) const
 {
     float px = d->pixRect.left() + d->pixRect.width() * ( p.x() - d->dataRect.x() ) / d->dataRect.width();
@@ -421,16 +428,15 @@ void KPlotWidget::maskRect( const QRectF& rf, float fvalue ) {
             d->plotMask.setPixel( ix, iy, newColor.rgba() );
         }
     }
-
 }
 
 void KPlotWidget::maskAlongLine( const QPointF &p1, const QPointF &p2, float fvalue ) {
     if ( ! d->pixRect.contains( p1.toPoint() ) && ! d->pixRect.contains( p2.toPoint() ) ) {
         return;
     }
-    
+
     int value = int( fvalue );
-    
+
     //Determine slope and zeropoint of line
     double m = (p2.y() - p1.y())/(p2.x() - p1.x());
     double y0 = p1.y() - m*p1.x();
@@ -459,7 +465,7 @@ void KPlotWidget::maskAlongLine( const QPointF &p1, const QPointF &p2, float fva
         int x1 = int( p1.x() );
         int x2 = int( p2.x() );
         if ( x1 > x2 ) {
-            x1 = int( p2.x() ); 
+            x1 = int( p2.x() );
             x2 = int( p1.x() );
         }
 
@@ -505,8 +511,8 @@ void KPlotWidget::placeLabel( QPainter *painter, KPlotPoint *pp ) {
     //beginning and select the next-best path.  The indices of
     //already-tried paths are stored in the TriedPathIndex list.
     //
-    //If we try all four first-step paths and still don't get below 
-    //maxCost, then we'll adopt the local minimum position with the 
+    //If we try all four first-step paths and still don't get below
+    //maxCost, then we'll adopt the local minimum position with the
     //best cost (designated as bestBadCost).
     int iter = 0;
     QList<int> TriedPathIndex;
@@ -517,7 +523,7 @@ void KPlotWidget::placeLabel( QPainter *painter, KPlotPoint *pp ) {
     bool flagStop = false;
 
     while ( bestCost > maxCost ) {
-        //Displace the label up, down, left, right; determine which 
+        //Displace the label up, down, left, right; determine which
         //step provides the lowest cost
         QRectF upRect = bestRect;
         upRect.moveTop( upRect.top() + yStep );
@@ -531,7 +537,7 @@ void KPlotWidget::placeLabel( QPainter *painter, KPlotPoint *pp ) {
         QRectF rightRect = bestRect;
         rightRect.moveLeft( rightRect.left() + xStep );
         float rightCost = d->rectCost( rightRect );
-        
+
         //which direction leads to the lowest cost?
         QList<float> costList;
         costList << upCost << downCost << leftCost << rightCost;
@@ -540,16 +546,16 @@ void KPlotWidget::placeLabel( QPainter *painter, KPlotPoint *pp ) {
             if ( iter == 0 && TriedPathIndex.contains( i ) ) {
                 continue; //Skip this first-step path, we already tried it!
             }
-            
-            //If this first-step path doesn't improve the cost, 
+
+            //If this first-step path doesn't improve the cost,
             //skip this direction from now on
             if ( iter == 0 && costList[i] >= bestCost ) {
                 TriedPathIndex.append( i );
                 continue;
             }
-            
+
             if ( costList[i] < bestCost && (imin < 0 || costList[i] < costList[imin]) ) {
-                
+
                 imin = i;
             }
         }
@@ -577,7 +583,7 @@ void KPlotWidget::placeLabel( QPainter *painter, KPlotPoint *pp ) {
             bestRect.moveLeft( rightRect.left() );
             bestCost = rightCost;
             break;
-        case -1: //no lower cost found!  
+        case -1: //no lower cost found!
             //We hit a local minimum.  Keep the best of these as bestBadRect
             if ( bestCost < bestBadCost ) {
                 bestBadCost = bestCost;
@@ -594,20 +600,20 @@ void KPlotWidget::placeLabel( QPainter *painter, KPlotPoint *pp ) {
 
             //If we haven't yet tried all of the first-step paths, start over
             if ( TriedPathIndex.size() < 4 ) {
-                iter = -1; //anticipating the ++iter below	    
+                iter = -1; //anticipating the ++iter below
                 bestRect = fm.boundingRect( QRectF( pos.x(), pos.y(), 1, 1 ), textFlags, pp->label() );
                 bestCost = d->rectCost( bestRect );
             }
             break;
         }
 
-        //Halt iteration, because we've tried all directions and 
-        //haven't gotten below maxCost (we'll adopt the best 
+        //Halt iteration, because we've tried all directions and
+        //haven't gotten below maxCost (we'll adopt the best
         //local minimum found)
         if ( flagStop ) {
             break;
         }
-        
+
         ++iter;
     }
 
@@ -618,7 +624,7 @@ void KPlotWidget::placeLabel( QPainter *painter, KPlotPoint *pp ) {
     float deltay = pos.y() - bestRect.center().y();
     float rbest = sqrt( deltax*deltax + deltay*deltay );
     if ( rbest > 20.0 ) {
-        //Draw a rectangle around the label 
+        //Draw a rectangle around the label
         painter->setBrush( QBrush() );
         //QPen pen = painter->pen();
         //pen.setStyle( Qt::DotLine );
@@ -641,7 +647,7 @@ void KPlotWidget::placeLabel( QPainter *painter, KPlotPoint *pp ) {
 
         painter->drawLine( QPointF( xline, yline ), pos );
     }
-                                            
+
     //Mask the label's rectangle so other labels won't overlap it.
     maskRect( bestRect );
 }
@@ -651,7 +657,7 @@ float KPlotWidget::Private::rectCost( const QRectF &r ) const
     if ( ! plotMask.rect().contains( r.toRect() ) ) {
         return 10000.;
     }
-    
+
     //Compute sum of mask values in the rect r
     QImage subMask = plotMask.copy( r.toRect() );
     int cost = 0;
@@ -660,7 +666,7 @@ float KPlotWidget::Private::rectCost( const QRectF &r ) const
             cost += QColor( subMask.pixel( ix, iy ) ).red();
         }
     }
-    
+
     return float(cost);
 }
 
@@ -726,10 +732,9 @@ void KPlotWidget::drawAxes( QPainter *p ) {
 
         // Draw major tickmarks
         foreach( double xx, a->majorTickMarks() ) {
-qDebug() << __LINE__ << "tick mark:" << xx;
             double px = d->pixRect.width() * (xx - d->dataRect.x()) / d->dataRect.width();
             if ( px > 0 && px < d->pixRect.width() ) {
-                p->drawLine( QPointF( px, double(d->pixRect.height() - TICKOFFSET)), 
+                p->drawLine( QPointF( px, double(d->pixRect.height() - TICKOFFSET)),
                         QPointF( px, double(d->pixRect.height() - BIGTICKSIZE - TICKOFFSET)) );
 
                 //Draw ticklabel
@@ -744,7 +749,7 @@ qDebug() << __LINE__ << "tick mark:" << xx;
         foreach ( double xx, a->minorTickMarks() ) {
             double px = d->pixRect.width() * (xx - d->dataRect.x()) / d->dataRect.width();
             if ( px > 0 && px < d->pixRect.width() ) {
-                p->drawLine( QPointF( px, double(d->pixRect.height() - TICKOFFSET)), 
+                p->drawLine( QPointF( px, double(d->pixRect.height() - TICKOFFSET)),
                         QPointF( px, double(d->pixRect.height() - SMALLTICKSIZE -TICKOFFSET)) );
             }
         }
@@ -788,14 +793,14 @@ qDebug() << __LINE__ << "tick mark:" << xx;
         if ( ! a->label().isEmpty() ) {
             //store current painter translation/rotation state
             p->save();
-    
+
             //translate coord sys to left corner of axis label rectangle, then rotate 90 degrees.
             p->translate( -3*XPADDING, d->pixRect.height() );
             p->rotate( -90.0 );
-    
+
             QRect r( 0, 0, d->pixRect.height(), XPADDING );
             p->drawText( r, Qt::AlignCenter, a->label() ); //draw the label, now that we are sideways
-    
+
             p->restore();  //restore translation/rotation state
         }
     }  //End of LeftAxis
@@ -820,7 +825,6 @@ qDebug() << __LINE__ << "tick mark:" << xx;
 
         // Draw major tickmarks
         foreach( double xx, a->majorTickMarks() ) {
-            qDebug() << __LINE__ << "tick mark:" << xx;
             double px = d->pixRect.width() * (xx - x0) / dw;
             if ( px > 0 && px < d->pixRect.width() ) {
                 p->drawLine( QPointF( px, TICKOFFSET ), QPointF( px, double(BIGTICKSIZE + TICKOFFSET)) );
@@ -858,7 +862,7 @@ qDebug() << __LINE__ << "tick mark:" << xx;
         foreach( double yy, a->majorTickMarks() ) {
             double py = d->pixRect.height() * ( 1.0 - (yy - y0) / dh );
             if ( py > 0 && py < d->pixRect.height() ) {
-                p->drawLine( QPointF( double(d->pixRect.width() - TICKOFFSET), py ), 
+                p->drawLine( QPointF( double(d->pixRect.width() - TICKOFFSET), py ),
                         QPointF( double(d->pixRect.width() - TICKOFFSET - BIGTICKSIZE), py ) );
 
                 //Draw ticklabel
@@ -873,7 +877,7 @@ qDebug() << __LINE__ << "tick mark:" << xx;
         foreach ( double yy, a->minorTickMarks() ) {
             double py = d->pixRect.height() * ( 1.0 - (yy - y0) / dh );
             if ( py > 0 && py < d->pixRect.height() ) {
-                p->drawLine( QPointF( double(d->pixRect.width() - 0.0), py ), 
+                p->drawLine( QPointF( double(d->pixRect.width() - 0.0), py ),
                         QPointF( double(d->pixRect.width() - 0.0 - SMALLTICKSIZE), py ) );
             }
         }
@@ -882,14 +886,14 @@ qDebug() << __LINE__ << "tick mark:" << xx;
         if ( ! a->label().isEmpty() ) {
             //store current painter translation/rotation state
             p->save();
-    
+
             //translate coord sys to left corner of axis label rectangle, then rotate 90 degrees.
             p->translate( d->pixRect.width() + 2*XPADDING, d->pixRect.height() );
             p->rotate( -90.0 );
-    
+
             QRect r( 0, 0, d->pixRect.height(), XPADDING );
             p->drawText( r, Qt::AlignCenter, a->label() ); //draw the label, now that we are sideways
-    
+
             p->restore();  //restore translation/rotation state
         }
     }  //End of RightAxis

@@ -23,7 +23,7 @@
 #include <QtAlgorithms>
 #include <QPainter>
 
-#include <kdebug.h>
+#include <QDebug>
 
 class KPlotPoint::Private
 {

@@ -21,7 +21,7 @@
 #ifndef KPLOTPOINT_H
 #define KPLOTPOINT_H
 
-#include <kdeui_export.h>
+//#include <kdeui_export.h>
 
 #include <QtCore/QString>
 
@@ -33,8 +33,8 @@ class QPointF;
  * A KPlotPoint consists of X and Y coordinates (in Data units),
  * an optional label string, and an optional bar-width,
  * The bar-width is only used for plots of type KPlotObject::Bars,
- * and it allows the width of each bar to be set manually.  If 
- * bar-widths are omitted, then the widths will be set automatically, 
+ * and it allows the width of each bar to be set manually.  If
+ * bar-widths are omitted, then the widths will be set automatically,
  * based on the halfway-mark between adjacent points.
  */
 class /*KDEUI_EXPORT*/ KPlotPoint {
@@ -48,7 +48,7 @@ public:
      * Constructor.  Sets the KPlotPoint according to the given arguments
      * @param x the X-position for the point, in Data units
      * @param y the Y-position for the point, in Data units
-     * @param label the label string for the point.  If the string 
+     * @param label the label string for the point.  If the string
      * is defined, the point will be labeled in the plot.
      * @param width the bar width to use for this point (only used for
      * plots of type KPlotObject::Bars)
@@ -58,7 +58,7 @@ public:
     /**
      * Constructor.  Sets the KPlotPoint according to the given arguments
      * @param p the position for the point, in Data units
-     * @param label the label string for the point.  If the string 
+     * @param label the label string for the point.  If the string
      * is defined, the point will be labeled in the plot.
      * @param width the bar width to use for this point (only used for
      * plots of type KPlotObject::Bars)

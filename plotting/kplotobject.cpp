@@ -23,7 +23,7 @@
 #include <QtAlgorithms>
 #include <QPainter>
 
-#include <kdebug.h>
+#include <QDebug>
 
 #include "kplotpoint.h"
 #include "kplotwidget.h"
@@ -200,7 +200,7 @@ QList< KPlotPoint* > KPlotObject::points() const
 
 void KPlotObject::addPoint( const QPointF &p, const QString &label, double barWidth )
 {
-			addPoint( new KPlotPoint( p.x(), p.y(), label, barWidth ) );
+    addPoint( new KPlotPoint( p.x(), p.y(), label, barWidth ) );
 }
 
 void KPlotObject::addPoint( KPlotPoint *p )
@@ -212,12 +212,12 @@ void KPlotObject::addPoint( KPlotPoint *p )
 
 void KPlotObject::addPoint( double x, double y, const QString &label, double barWidth )
 {
-	addPoint( new KPlotPoint( x, y, label, barWidth ) );
+        addPoint( new KPlotPoint( x, y, label, barWidth ) );
 }
 
 void KPlotObject::removePoint( int index ) {
     if ( ( index < 0 ) || ( index >= d->pList.count() ) ) {
-        kWarning() << "KPlotObject::removePoint(): index " << index << " out of range!";
+        qWarning() << "KPlotObject::removePoint(): index " << index << " out of range!";
         return;
     }
 
@@ -231,7 +231,7 @@ void KPlotObject::clearPoints()
 }
 
 void KPlotObject::draw( QPainter *painter, KPlotWidget *pw ) {
-    //Order of drawing determines z-distance: Bars in the back, then lines, 
+    //Order of drawing determines z-distance: Bars in the back, then lines,
     //then points, then labels.
 
     if ( d->type & Bars ) {
@@ -241,7 +241,7 @@ void KPlotObject::draw( QPainter *painter, KPlotWidget *pw ) {
         for ( int i=0; i<d->pList.size(); ++i ) {
             double w = 0;
             if ( d->pList[i]->barWidth() == 0.0 ) {
-                if ( i<d->pList.size()-1 ) 
+                if ( i<d->pList.size()-1 )
                     w = d->pList[i+1]->x() - d->pList[i]->x();
                 //For the last bin, we'll just keep the previous width
 
@@ -260,7 +260,7 @@ void KPlotObject::draw( QPainter *painter, KPlotWidget *pw ) {
             pw->maskRect( barRect, 0.25 );
         }
     }
-    
+
     //Draw lines:
     if ( d->type & Lines ) {
         painter->setPen( linePen() );
@@ -275,7 +275,7 @@ void KPlotObject::draw( QPainter *painter, KPlotWidget *pw ) {
                 painter->drawLine( Previous, q );
                 pw->maskAlongLine( Previous, q );
             }
-            
+
             Previous = q;
         }
     }
@@ -290,40 +290,40 @@ void KPlotObject::draw( QPainter *painter, KPlotWidget *pw ) {
                 double x1 = q.x() - size();
                 double y1 = q.y() - size();
                 QRectF qr = QRectF( x1, y1, 2*size(), 2*size() );
-    
+
                 //Mask out this rect in the plot for label avoidance
                 pw->maskRect( qr, 2.0 );
-    
+
                 painter->setPen( pen() );
                 painter->setBrush( brush() );
-    
+
                 switch ( pointStyle() ) {
                 case Circle:
                     painter->drawEllipse( qr );
                     break;
-    
+
                 case Letter:
                     painter->drawText( qr, Qt::AlignCenter, pp->label().left(1) );
                     break;
-    
+
                 case Triangle:
                     {
                         QPolygonF tri;
-                        tri << QPointF( q.x() - size(), q.y() + size() ) 
-                                << QPointF( q.x(), q.y() - size() ) 
+                        tri << QPointF( q.x() - size(), q.y() + size() )
+                                << QPointF( q.x(), q.y() - size() )
                                 << QPointF( q.x() + size(), q.y() + size() );
                         painter->drawPolygon( tri );
                         break;
                     }
-    
+
                 case Square:
                     painter->drawRect( qr );
                     break;
-    
+
                 case Pentagon:
                     {
                         QPolygonF pent;
-                        pent << QPointF( q.x(), q.y() - size() ) 
+                        pent << QPointF( q.x(), q.y() - size() )
                                 << QPointF( q.x() + size(), q.y() - 0.309*size() )
                                 << QPointF( q.x() + 0.588*size(), q.y() + size() )
                                 << QPointF( q.x() - 0.588*size(), q.y() + size() )
@@ -331,11 +331,11 @@ void KPlotObject::draw( QPainter *painter, KPlotWidget *pw ) {
                         painter->drawPolygon( pent );
                         break;
                     }
-    
+
                 case Hexagon:
                     {
                         QPolygonF hex;
-                        hex << QPointF( q.x(), q.y() + size() ) 
+                        hex << QPointF( q.x(), q.y() + size() )
                                 << QPointF( q.x() + size(), q.y() + 0.5*size() )
                                 << QPointF( q.x() + size(), q.y() - 0.5*size() )
                                 << QPointF( q.x(), q.y() - size() )
@@ -344,7 +344,7 @@ void KPlotObject::draw( QPainter *painter, KPlotWidget *pw ) {
                         painter->drawPolygon( hex );
                         break;
                     }
-    
+
                 case Asterisk:
                     painter->drawLine( q, QPointF( q.x(), q.y() + size() ) );
                     painter->drawLine( q, QPointF( q.x() + size(), q.y() + 0.5*size() ) );
@@ -353,11 +353,11 @@ void KPlotObject::draw( QPainter *painter, KPlotWidget *pw ) {
                     painter->drawLine( q, QPointF( q.x() - size(), q.y() + 0.5*size() ) );
                     painter->drawLine( q, QPointF( q.x() - size(), q.y() - 0.5*size() ) );
                     break;
-    
+
                 case Star:
                     {
                         QPolygonF star;
-                        star << QPointF( q.x(), q.y() - size() ) 
+                        star << QPointF( q.x(), q.y() - size() )
                                 << QPointF( q.x() + 0.2245*size(), q.y() - 0.309*size() )
                                 << QPointF( q.x() + size(), q.y() - 0.309*size() )
                                 << QPointF( q.x() + 0.363*size(), q.y() + 0.118*size() )
@@ -370,7 +370,7 @@ void KPlotObject::draw( QPainter *painter, KPlotWidget *pw ) {
                         painter->drawPolygon( star );
                         break;
                     }
-    
+
                 default:
                     break;
                 }

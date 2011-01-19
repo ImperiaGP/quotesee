@@ -21,7 +21,7 @@
 #ifndef KPLOTOBJECT_H
 #define KPLOTOBJECT_H
 
-#include <kdeui_export.h>
+//#include <kdeui_export.h>
 
 #include <QtCore/QString>
 #include <QtGui/QColor>
@@ -38,7 +38,7 @@ class KPlotPoint;
  * @short Encapsulates a data set to be plotted in a KPlotWidget.
  *
  * Think of a KPlotObject as a set of data displayed as a group in the plot.
- * Each KPlotObject consists of a list of KPlotPoints, a "type" controlling 
+ * Each KPlotObject consists of a list of KPlotPoints, a "type" controlling
  * how the data points are displayed (some combination of Points, Lines, or
  * Bars), a color, and a size. There is also a parameter which controls the
  * shape of the points used to display the KPlotObject.
@@ -150,7 +150,7 @@ public:
 
     /**
      * @return the default pen for this Object.
-     * If no other pens are set, this pen will be used for 
+     * If no other pens are set, this pen will be used for
      * points, lines, bars and labels (this pen is always used for points).
      */
     const QPen& pen() const;
@@ -160,7 +160,7 @@ public:
      * @p The pen to use
      */
     void setPen( const QPen &p );
-    
+
     /**
      * @return the pen to use for drawing lines for this Object.
      */
@@ -171,7 +171,7 @@ public:
      * @p The pen to use
      */
     void setLinePen( const QPen &p );
-    
+
     /**
      * @return the pen to use for drawing bars for this Object.
      */
@@ -182,7 +182,7 @@ public:
      * @p The pen to use
      */
     void setBarPen( const QPen &p );
-    
+
     /**
      * @return the pen to use for drawing labels for this Object.
      */
@@ -193,7 +193,7 @@ public:
      * @p The pen to use
      */
     void setLabelPen( const QPen &p );
-    
+
     /**
      * @return the default Brush to use for this Object.
      */
@@ -226,8 +226,8 @@ public:
      * @param p the QPointF to add.
      * @param label the optional text label for this point
      * @param barWidth the width of the bar, if this object is to be drawn with bars
-     * @note if @param barWidth is left at its default value of 0.0, then the width will be 
-		 * automatically set to the distance between this point and the one to its right.
+     * @note if @param barWidth is left at its default value of 0.0, then the width will be
+                 * automatically set to the distance between this point and the one to its right.
      */
     void addPoint( const QPointF &p, const QString &label = QString(), double barWidth = 0.0 );
 
@@ -245,8 +245,8 @@ public:
      * @param y the Y-coordinate of the point to add.
      * @param label the optional text label
      * @param barWidth the width of the bar, if this object is to be drawn with bars
-     * @note if @param barWidth is left at its default value of 0.0, then the width will be 
-		 * automatically set to the distance between this point and the one to its right.
+     * @note if @param barWidth is left at its default value of 0.0, then the width will be
+                 * automatically set to the distance between this point and the one to its right.
      */
     void addPoint( double x, double y, const QString &label = QString(), double barWidth = 0.0 );
 
@@ -264,7 +264,7 @@ public:
     /**
      * Draw this KPlotObject on the given QPainter
      * @param p The QPainter to draw on
-     * @param pw the KPlotWidget to draw on (this is needed 
+     * @param pw the KPlotWidget to draw on (this is needed
      * for the KPlotWidget::mapToWidget() function)
      */
     void draw( QPainter *p, KPlotWidget *pw );
