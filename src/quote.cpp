@@ -29,9 +29,6 @@
 #include "plotting/kplotobject.h"
 #include "plotting/kplotpoint.h"
 
-
-//#include <QDateTime>
-
 Quote::Quote(QGraphicsWidget *parent) :
         QGraphicsWidget(parent),
         status(PROCESSING),
@@ -51,8 +48,6 @@ Quote::Quote(QGraphicsWidget *parent) :
     setMinimumHeight(55);
     setMaximumHeight(55);
     setMinimumWidth(270);
-    // Tooltips display time and date of last trade
-//    Plasma::ToolTipManager::self()->registerWidget(this);
 
     points = new MRIDeque<PlotPoint>(10);
 
@@ -87,11 +82,6 @@ Quote::Quote(QGraphicsWidget *parent) :
     qreal height = geometry().height();
     // show external link icon
     m_ext_icon->setPos(width - m_ext_icon->geometry().width(), (height - m_ext_icon->geometry().height())/2);
-
-//     limits[0] = -1;
-//     limits[1] = 1;
-//    pt.height = 0;
-//    pt.width = 0;
 }
 
 Quote::~Quote()
@@ -118,17 +108,6 @@ void Quote::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
     painter->drawText(frame, Qt::AlignLeft  | Qt::AlignTop, code.toUpper());
 
     painter->drawText(frame, Qt::AlignLeft  | Qt::AlignBottom, name);
-
-//    painter->setPen(Qt::red);
-//    painter->drawRect(mapFromParent(0, 0).x(),
-//                      mapFromParent(0, 0).y(),
-//                      pt.width,
-//                      pt.height);
-
-//    kDebug() << "painting:" << mapFromParent(0, 0).x() <<
-//                            mapFromParent(0, 0).y() <<
-//                            pt.width <<
-//                            pt.height;
 
     QString schange;
     QTextStream stream(&schange);
@@ -178,30 +157,9 @@ void Quote::iconClicked()
     KRun::runUrl(KUrl(url), "text/html", 0);
 }
 
-//void Quote::toolTipAboutToShow()
-//{
-//    QString content;
-//    content += i18n("Trade date: %1 ET<br />", lastTradeDate);
-//    content += i18n("Trade time: %1 ET<br />", lastTradeTime);
-//    Plasma::ToolTipManager::self()->setContent(this, Plasma::ToolTipContent(i18n(name.toAscii()), content));
-//}
-
 void Quote::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     Q_UNUSED(event);
-
-//    if(parentWidget())
-//    {
-//        pt.height = parentWidget()->size().height();
-//        pt.width = parentWidget()->size().width();
-//    }
-//    kDebug() << "mapped from parent:" << mapFromParent(0, 0).x()
-//                               << mapFromParent(0, 0).y()
-//                               << mapFromParent(pt.width, pt.height).x()
-//                               << mapFromParent(pt.width, pt.height).y()
-//                               << "|"
-//                               << pt.width
-//                               << pt.height;
 
     QString content;
     content += i18n("Last trade date: %1 ET<br />", lastTradeDate);
@@ -228,15 +186,15 @@ void Quote::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     m_plotter->hide();
     update();
 }
+
 double Quote::toAxisTime(QTime val)
 {
     int h = val.hour();
-//    int m = int(10000 * (val + 0.005 - h)/60);
-    int m = 10*val.minute()/60;
-    qDebug() << "<----------------- TO AXIS TIME" << val.toString() << h << m;
+    int m = 100*val.minute()/60;
 
     return (double)h + (double)m/100;
 }
+
 void Quote::makeNewPlot()
 {
     QTime time = QTime::fromString(lastTradeTime, "h:mmap");
@@ -247,19 +205,10 @@ void Quote::makeNewPlot()
     pt.yahooTime = lastTradeTime;
     pt.price = lastTrade.toDouble();
 
-
-
-//            kDebug() << __LINE__ << "points is:" << pt.axisTime << pt.price;
-//            kDebug() << __LINE__ << "actual time:" << lastTradeTime;
-
     // should be safe, if deque empty, it won't check the second condition
     if((points->empty()) || (points->at(0).axisTime != pt.axisTime))
     {
-//                kDebug() << __LINE__ << "pushing point" << pt.axisTime << pt.price;
         points->push(pt);
-    }
-    else{
-//                kDebug() << __LINE__ << "data unchanged since last update";
     }
 
     // print contents of deque
@@ -296,45 +245,27 @@ void Quote::makeNewPlot()
         if(p.price < minPrice)
         {
             minPrice = p.price;
-//                    kDebug() << __LINE__ << "minPrice: " << minPrice;
         }
         if(p.price > maxPrice)
         {
             maxPrice = p.price;
-//                    kDebug() << __LINE__ <<  "maxPrice" << maxPrice;
         }
     }
+
     qDebug() << __LINE__ << "minPrice:" << minPrice << "maxPrice:" << maxPrice;
     qDebug() << __LINE__ << "minTime :" << points->last().actualTime
              << "maxTime" << points->first().actualTime;
 
-    // get max and min time from queue
-
     // each update paint points from queue, makes it easier to maintain
     ob->clearPoints();
 
-//            kDebug() << "points cleared";
+    /* axis limites */
+    m_plotter->setLimits(points->last().actualTime-0.006, points->first().actualTime+0.003, minPrice-0.05, maxPrice+0.05);
 
-    if(points->count() > 1)
+    foreach(PlotPoint p, *points)
     {
-
-        /* axis limites */
-        m_plotter->setLimits(points->last().actualTime-0.06, points->first().actualTime+0.03, minPrice-0.05, maxPrice+0.05);
-        qDebug() << "[LIMITS]:"<< points->last().actualTime << points->first().actualTime;
-
-        foreach(PlotPoint p, *points)
-        {
-//                    kDebug() << "adding point to graph:" << "[" << p.actualTime << "]" << p.axisTime << p.price;
-            ob->addPoint(p.actualTime, p.price, QString::number(p.actualTime, 'f', 2));
-        }
+        ob->addPoint(p.axisTime, p.price, QString::number(p.axisTime, 'f', 2));
     }
-
-//    qDebug() << "plot points:";
-//    foreach( KPlotObject *po, m_plotter->plotObjects() ) {
-//        foreach( KPlotPoint *p, po->points() ) {
-//            qDebug() << "(" << p->x() << "," << p->y() << ")";
-//        }
-//    }
 }
 
 void Quote::dataUpdated(const QString &source, const Plasma::DataEngine::Data &data)
@@ -348,18 +279,6 @@ void Quote::dataUpdated(const QString &source, const Plasma::DataEngine::Data &d
 
     kDebug() << __LINE__ << "************************update:" << updateNum;
 
-//    if (!data.isEmpty())
-//    {
-//        QHashIterator<QString, QVariant> it(data);
-//        while (it.hasNext())
-//        {
-//            it.next();
-//            qDebug("---------- %s: %s",
-//                   it.key().toLatin1().data(),
-//                   it.value().toString().toLatin1().data());
-//        }
-//    }
-
     if(!data.empty())
     {
         code          = source;
@@ -370,7 +289,6 @@ void Quote::dataUpdated(const QString &source, const Plasma::DataEngine::Data &d
         lastTradeTime = data["last_trade_time"].toString();
         lastTradeDate = data["last_trade_date"].toString();
 
-
     qDebug("  -> %s | %s | %s | %s | %s | %s\n",
            code.toLatin1().data(),
            name.toLatin1().data(),
@@ -380,7 +298,6 @@ void Quote::dataUpdated(const QString &source, const Plasma::DataEngine::Data &d
            lastTradeDate.toLatin1().data());
 
     makeNewPlot();
-    //////////////////////////////////
 
     }
     updateNum++;
