@@ -17,12 +17,10 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-/********************************************/
-#include </usr/include/KDE/Plasma/DataContainer>
-/********************************************/
 #include "quoteseeengine.h"
-#include "useyql.h"
-
+#include <Plasma/DataContainer>
+#include <kio/job.h>
+#include <QXmlStreamReader>
 #include <kurl.h>
 
 QuoteseeEngine::QuoteseeEngine(QObject* parent, const QVariantList& args)
@@ -31,22 +29,14 @@ QuoteseeEngine::QuoteseeEngine(QObject* parent, const QVariantList& args)
     // We ignore any arguments - data engines do not have much use for them
     Q_UNUSED(args);
 
-    ///////////////////
-    manager = new QNetworkAccessManager(this);
-
-    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
-    ///////////////////
-
     // YQL Usage limits: http://developer.yahoo.com/yql/
     // Per IP limits: /v1/public/*: 1,000 calls per hour
     // This is relevant when using UseYQL (in CSVtoQuoteList()), there's no info on limits for download.finance.yahoo.com
-    // 1 minute - [minutes * seconds * miliseconds]
-    setMinimumPollingInterval(1 * 10 * 1000);
+    // 1 minute - [minutes multiplier * seconds * miliseconds]
+    setMinimumPollingInterval(1 * 60 * 1000);
 }
 QuoteseeEngine::~QuoteseeEngine()
 {
-//    delete manager;
-//    manager = 0;
 }
 
 bool QuoteseeEngine::sourceRequestEvent(const QString &name)
@@ -57,6 +47,8 @@ bool QuoteseeEngine::sourceRequestEvent(const QString &name)
 
 bool QuoteseeEngine::updateSourceEvent(const QString &name)
 {
+    code = name.toLower();
+
     KUrl url("http://download.finance.yahoo.com");
 
     url.setPath("/d/quotes.csv");
@@ -76,77 +68,52 @@ bool QuoteseeEngine::updateSourceEvent(const QString &name)
     url.addQueryItem("e", ".csv");
     url.addQueryItem("s", name);
 
-//    KIO::TransferJob* job = KIO::get(url, KIO::Reload, KIO::HideProgressInfo);
+    KIO::TransferJob* job = KIO::get(url, KIO::Reload, KIO::HideProgressInfo);
 
-//    connect(job,  SIGNAL(data(KIO::Job*, const QByteArray&)),
-//            this, SLOT(replyFinished(KIO::Job*, const QByteArray&)));
-
-    manager->get(QNetworkRequest(url));
+    connect(job, SIGNAL(data(KIO::Job*, const QByteArray&)),
+            this, SLOT(replyFinished(KIO::Job*, const QByteArray&)));
+    connect(job, SIGNAL(result(KJob *)),
+            this, SLOT(jobResult(KJob *)));
 
     return true;
 }
 
-void QuoteseeEngine::replyFinished(/*KIO::Job* job, const QByteArray& data*/QNetworkReply *job)
+void QuoteseeEngine::jobResult(KJob *job)
 {
-
-    if (job->error() != QNetworkReply::NoError)
+    if(job->error())
     {
-//        setData(reply->url().queryItemValue("name"), "status", false);
-//        setData(reply->url().queryItemValue("name"), "code", reply->url().queryItemValue("name"));
-//        setData(reply->url().queryItemValue("name"), "change", "N/A");
-//        setData(reply->url().queryItemValue("name"), "last_trade", "Network Error");
-//        setData(reply->url().queryItemValue("name"), "last_trade_date", "N/A");
-//        setData(reply->url().queryItemValue("name"), "last_trade_time", "N/A");
-//        setData(reply->url().queryItemValue("name"), "name", "Request failed");
+        qWarning("Request failed, network error: %s%s", job->errorString().toLatin1().data(), job->errorText().toLatin1().data());
 
-        qDebug("[%s:%i] %s()",
-               ((strrchr(__FILE__, '/') ? : __FILE__ - 1) + 1),
-               __LINE__,
-               __FUNCTION__);
+        setData(code, "status", false);
+        setData(code, "code", code);
+        setData(code, "change", "N/A");
+        setData(code, "last_trade", "Network Error");
+        setData(code, "last_trade_date", "N/A");
+        setData(code, "last_trade_time", "N/A");
+        setData(code, "name", "Request failed");
 
-//        qDebug("data[] %s | %s | %s | %s | %s | %s\n",
-//               reply->url().queryItemValue("name").toLatin1().data(),
-//               Data().value("name").toString().toLatin1().data(),
-//               Data().value("last_trade").toString().toLatin1().data(),
-//               Data().value("change"    ).toString().toLatin1().data(),
-//               Data().value("last_trade_time").toString().toLatin1().data(),
-//               Data().value("last_trade_date").toString().toLatin1().data());
-
-        qWarning("Request failed, network error: %s", job->errorString().toLatin1().data());
+        job->deleteLater();
+        goodResult = false;
     }
-    else
-        CSVtoQuoteList(job/*data*/);
+    goodResult = true;
 }
 
-void QuoteseeEngine::getChangeData(QString code, QString change)
+void QuoteseeEngine::replyFinished(KIO::Job* job, const QByteArray& data)
 {
-    Q_UNUSED(code);
-    qDebug("[%s:%i] %s()\t %s",
-           ((strrchr(__FILE__, '/') ? : __FILE__ - 1) + 1),
-           __LINE__,__FUNCTION__,
-           change.toLatin1().data());
-
-    setData(code, "change", change);
-
-    qDebug("[%s:%i] %s()\tafter set data",
-           ((strrchr(__FILE__, '/') ? : __FILE__ - 1) + 1),
-           __LINE__,
-           __FUNCTION__);
+    if(goodResult)
+        CSVtoQuoteList(data);
 }
-void QuoteseeEngine::CSVtoQuoteList(/*const QByteArray &data*/QIODevice *resp)
-{
-    QByteArray s;
 
-    QString csvContents(resp->readAll());
-//    QString csvContents(data);
-//    kDebug() << __LINE__ <<"data from engine:" << csvContents;
+void QuoteseeEngine::CSVtoQuoteList(const QByteArray &data)
+{
+    QString csvContents = QString(data);
 
     QStringList csvContentsByLine = csvContents.split("\r\n", QString::SkipEmptyParts);
     QStringList::ConstIterator stringListIterator;
 
     for(stringListIterator = csvContentsByLine.begin(); stringListIterator != csvContentsByLine.end(); ++stringListIterator)
     {
-        QString code = (*stringListIterator).section(",",1,1).remove("\"").toLower();
+        code = (*stringListIterator).section(",",1,1).remove("\"").toLower();
         if(!(*stringListIterator).section(",",0,0).startsWith("\"No such ticker"))
         {
             setData(code, "status", true);
@@ -157,28 +124,7 @@ void QuoteseeEngine::CSVtoQuoteList(/*const QByteArray &data*/QIODevice *resp)
             setData(code, "last_trade_time", (*stringListIterator).section(",",5,5).remove("\""));
             setData(code, "name", (*stringListIterator).section(",",6,7).remove("\""));
 
-//            if(code.endsWith("=x", Qt::CaseInsensitive))
-//            {
-//                UseYQL *change = new UseYQL;
-//                connect(change, SIGNAL(changeReady(QString, QString)), SLOT(getChangeData(QString, QString)));
-//                change->setCode(code);
-//            }
-//            else
-//            {
-//            qDebug("[%s:%i] %s()\t--setting change for item %s",
-//                   ((strrchr(__FILE__, '/') ? : __FILE__ - 1) + 1),
-//                   __LINE__,
-//                   __FUNCTION__,
-//                   code.toLatin1().data());
-
             setData(code, "change", (*stringListIterator).section(",",2,2));
-
-//            qDebug("[%s:%i] %s() change set for item %s",
-//                   ((strrchr(__FILE__, '/') ? : __FILE__ - 1) + 1),
-//                   __LINE__,
-//                   __FUNCTION__,
-//                   code.toLatin1().data());
-//            }
         }
         else
         {
