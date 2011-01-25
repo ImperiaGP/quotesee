@@ -121,33 +121,171 @@ void KPlotAxis::setTickMarks( double x0, double length ) {
         double s = pow( 10.0, pwr );
         double t = length / s;
 
+        /*************************/
+//        qDebug() << "";
+//        qDebug() << QString("%1%2%3%4").arg("LENGTH", -10)
+//                                       .arg("s", -10)
+//                                       .arg("t", -10)
+//                                       .arg("pwr", -10);
+//        qDebug() << QString("%1%2%3%4").arg(length, -10)
+//                                       .arg(s, -10)
+//                                       .arg(t, -10)
+//                                       .arg(pwr, -10);
+        /*************************/
+
         double TickDistance = 0.0; //The distance between major tickmarks
         int NumMajorTicks = 0; //will be between 3 and 5
         int NumMinorTicks = 0; //The number of minor ticks between major ticks (will be 4 or 5)
+         if(t < 0.1)
+        {
+            t *= 20.0;
+            s /= 10.0;
 
+//            qDebug() << "-6"
+//                     << QString("%1%2").arg("t", -15)
+//                                         .arg("s", -15);
+//            qDebug() << "-6"
+//                     << QString("%1%2").arg(t, -15)
+//                                         .arg(s, -15);
+        }
+        else if(t < 0.2)
+        {
+            t *= 200.0;
+            s /= 100.0;
+
+//            qDebug() << "-5"
+//                     << QString("%1%2").arg("t", -15)
+//                                         .arg("s", -15);
+//            qDebug() << "-5"
+//                     << QString("%1%2").arg(t, -15)
+//                                         .arg(s, -15);
+        }
+        else if(t < 0.3)
+        {
+            t *= 200.0;
+            s /= 100.0;
+
+//            qDebug() << "-4"
+//                     << QString("%1%2").arg("t", -15)
+//                                         .arg("s", -15);
+//            qDebug() << "-4"
+//                     << QString("%1%2").arg(t, -15)
+//                                         .arg(s, -15);
+        }
+        else if(t < 0.5)
+        {
+            t *= 10.0;
+            s /= 10.0;
+
+//            qDebug() << "-3"
+//                     << QString("%1%2").arg("t", -15)
+//                                         .arg("s", -15);
+//            qDebug() << "-3"
+//                     << QString("%1%2").arg(t, -15)
+//                                         .arg(s, -15);
+        }
+        else if(t < 0.7)
+        {
+            t *= 15.0;
+            s /= 10.0;
+
+//            qDebug() << "-2"
+//                     << QString("%1%2").arg("t", -15)
+//                                         .arg("s", -15);
+//            qDebug() << "-2"
+//                     << QString("%1%2").arg(t, -15)
+//                                         .arg(s, -15);
+        }
+        else if(t < 1.0)
+        {
+            t*= 50.0;
+            s/= 20.0;
+
+//            qDebug() << "-1"
+//                     << QString("%1%2").arg("t", -15)
+//                                         .arg("s", -15);
+//            qDebug() << "-1"
+//                     << QString("%1%2").arg(t, -15)
+//                                         .arg(s, -15);
+        }
         //adjust s and t such that t is between 3 and 5:
-        if ( t < 3.0 ) {
+        else if ( t < 3.0 ) {
                 t *= 10.0;
                 s /= 10.0;
                 // t is now between 3 and 30
+
+
+                /*************************/
+//                qDebug() << "0"
+//                         << QString("%1%2").arg("t", -15)
+//                                             .arg("s", -15);
+//                qDebug() << "0"
+//                         << QString("%1%2").arg(t, -15)
+//                                             .arg(s, -15);
+                /*************************/
         }
 
         if ( t < 6.0 ) { //accept current values
                 TickDistance = s;
                 NumMajorTicks = int( t );
                 NumMinorTicks = 5;
+
+                /*************************/
+//                qDebug() << "1"
+//                         << QString("%1%2%3").arg("TickDistance", -15)
+//                                             .arg("NumMajorTicks", -15)
+//                                             .arg("NumMinorTicks", -15);
+//                qDebug() << "1"
+//                         << QString("%1%2%3").arg(TickDistance, -15)
+//                                             .arg(NumMajorTicks, -15)
+//                                             .arg(NumMinorTicks, -15);
+                /*************************/
         } else if ( t < 10.0 ) { // adjust by a factor of 2
                 TickDistance = s * 2.0;
                 NumMajorTicks = int( t / 2.0 );
                 NumMinorTicks = 4;
+
+                /*************************/
+//                qDebug() << "2"
+//                         << QString("%1%2%3").arg("TickDistance", -15)
+//                                             .arg("NumMajorTicks", -15)
+//                                             .arg("NumMinorTicks", -15);
+//                qDebug() << "2"
+//                         << QString("%1%2%3").arg(TickDistance, -15)
+//                                             .arg(NumMajorTicks, -15)
+//                                             .arg(NumMinorTicks, -15);
+                /*************************/
         } else if ( t < 20.0 ) { //adjust by a factor of 4
                 TickDistance = s * 4.0;
                 NumMajorTicks = int( t / 4.0 );
                 NumMinorTicks = 4;
-        } else { //adjust by a factor of 5
+
+                /*************************/
+//                qDebug() << "3"
+//                         << QString("%1%2%3").arg("TickDistance", -15)
+//                                             .arg("NumMajorTicks", -15)
+//                                             .arg("NumMinorTicks", -15);
+//                qDebug() << "3"
+//                         << QString("%1%2%3").arg(TickDistance, -15)
+//                                             .arg(NumMajorTicks, -15)
+//                                             .arg(NumMinorTicks, -15);
+                /*************************/
+        }
+          else { //adjust by a factor of 5
                 TickDistance = s * 5.0;
                 NumMajorTicks = int( t / 5.0 );
                 NumMinorTicks = 5;
+
+                /*************************/
+//                qDebug() << "9"
+//                         << QString("%1%2%3").arg("TickDistance", -15)
+//                                             .arg("NumMajorTicks", -15)
+//                                             .arg("NumMinorTicks", -15);
+//                qDebug() << "9"
+//                         << QString("%1%2%3").arg(TickDistance, -15)
+//                                             .arg(NumMajorTicks, -15)
+//                                             .arg(NumMinorTicks, -15);
+                /*************************/
         }
 
         //We have determined the number of tickmarks and their separation
@@ -173,6 +311,11 @@ void KPlotAxis::setTickMarks( double x0, double length ) {
                                 d->m_MinorTickMarks.append( xmin );
                 }
         }
+
+        /*************************/
+//        qDebug() << "Major Tick Marks" << d->m_MajorTickMarks
+//                 << "\nMinor Tick Marks" << d->m_MinorTickMarks;
+        /*************************/
 }
 
 QString KPlotAxis::tickLabel( double val ) const {
