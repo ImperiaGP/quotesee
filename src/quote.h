@@ -34,14 +34,6 @@ namespace Plasma
   class IconWidget;
   class Svg;
 }
-//namespace QSParent
-//{
-//    struct Parent
-//    {
-//        int width;
-//        int height;
-//    };
-//}
 
 class Quote : public QGraphicsWidget
 {
@@ -80,12 +72,13 @@ class Quote : public QGraphicsWidget
         KPlotObject * ob;
         struct PlotPoint
         {
-            double axisTime;
-            double actualTime;
-            QString yahooTime;
+            double time;
             double price;
+            QString label;
         };
-        double toAxisTime(QTime val);
+
+        double lowerLimit(double time);
+        double toAxisTime(double val);
         void makeNewPlot();
         MRIDeque<PlotPoint> *points;
         int updateNum;
