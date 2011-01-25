@@ -21,13 +21,13 @@
 #define QUOTESEEENGINE_H
 
 #include <Plasma/DataEngine>
-#include <QXmlStreamReader>
-#include <QHttpResponseHeader>
-#include <QtNetwork>
-#include <QHttp>
-#include <QUrl>
 #include <QObject>
-#include <QThread>
+namespace KIO
+{
+    class Job;
+}
+class KJob;
+class QXmlStreamReader;
 
 class QuoteseeEngine : public Plasma::DataEngine
 {
@@ -39,13 +39,14 @@ class QuoteseeEngine : public Plasma::DataEngine
         ~QuoteseeEngine();
 
     private:
-        QNetworkAccessManager *manager;
-        void CSVtoQuoteList(QIODevice *);
+        void CSVtoQuoteList(const QByteArray &data);
         void SetData();
+        bool goodResult;
+        QString code;
 
     private slots:
-        void replyFinished(QNetworkReply* reply);
-        void getChangeData(QString, QString);
+        void replyFinished(KIO::Job* job, const QByteArray& data);
+        void jobResult(KJob *);
 
     protected:
         // this virtual function is called when a new source is requested
