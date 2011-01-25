@@ -3,7 +3,7 @@
 # -------------------------------------------------
 TARGET = quotesee
 TEMPLATE = app
-SOURCES += data_engine/useyql.cpp \
+SOURCES += \
     data_engine/quoteseeengine.cpp \
     src/quotesee.cpp \
     src/quote.cpp \
@@ -14,7 +14,7 @@ SOURCES += data_engine/useyql.cpp \
     plotting/kplotpoint.cpp \
     plotting/kplotobject.cpp \
     plotting/kplotaxis.cpp
-HEADERS += data_engine/useyql.h \
+HEADERS += \
     data_engine/quoteseeengine.h \
     src/ui_qsgeneralconfig.h \
     src/ui_qsconfig.h \
@@ -25,7 +25,6 @@ HEADERS += data_engine/useyql.h \
     qsdebug.h \
     src/plotter.h \
     src/mrideque.h \
-    src/axisscale.h \
     plotting/kplotwidget.h \
     plotting/kplotpoint.h \
     plotting/kplotobject.h \
