@@ -1,3 +1,6 @@
+QuoteSee 0.2.3 [2014-01-25] Gerry Jacobs <gee_jay_@yahoo.com>
+* Sizing applet fixed
+
 QuoteSee 0.2.2 [2009-10-09] Jan Zegan <jzegan@gmail.com>
 * Fixed symbol case bug and altered size handling code
 * Increased width 25 pixels

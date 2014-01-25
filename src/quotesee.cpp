@@ -1,4 +1,4 @@
-/*   QuoteSee 0.2.2
+/*   QuoteSee 0.2.3
  *   Copyright 2009  Jan Zegan <jzegan@gmail.com>
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -111,7 +111,6 @@ void QuoteSee::init()
 
     m_layout = new QGraphicsLinearLayout(Qt::Vertical, this);
     m_layout->setSpacing(5);
-    m_layout->addStretch();
 
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
@@ -147,6 +146,22 @@ void QuoteSee::constraintsEvent(Plasma::Constraints constraints)
 //    {
 //        setContentsMargins(0.0, 0.0, 0.0, 0.0);
 //    }
+}
+
+void QuoteSee::resizeEvent(QGraphicsSceneResizeEvent *event)
+{
+    foreach(QGraphicsWidget *q, m_quote_list)
+    {
+        q->resize(event->newSize().width(), q->size().height());
+    }
+
+    if (m_layout)
+    {
+        QRectF rect(m_layout->geometry());
+        rect.setWidth(event->newSize().width());
+        m_layout->setGeometry(rect);
+    }
+    update();
 }
 
 void QuoteSee::connectSources()
@@ -246,6 +261,8 @@ void QuoteSee::paintQuotes()
         if(q->isWidget())
             m_layout->insertItem(m_layout->count() - 1, q);
     }
+
+    m_layout->addStretch();
 
     updateConstraints();
 }

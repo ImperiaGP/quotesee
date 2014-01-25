@@ -1,4 +1,4 @@
-/*   QuoteSee 0.2.2
+/*   QuoteSee 0.2.3
  *   Copyright 2009  Jan Zegan <jzegan@gmail.com>
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -95,6 +95,7 @@ private slots:
 
 protected:
     void            constraintsEvent(Plasma::Constraints constraints);
+    void            resizeEvent(QGraphicsSceneResizeEvent *event);
 //    void            debugOutput(QtMsgType type, const char *msg);
 };
 

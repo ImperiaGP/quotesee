@@ -1,4 +1,4 @@
-/*   QuoteSee 0.2.2
+/*   QuoteSee 0.2.3
  *   Copyright 2009  Jan Zegan <jzegan@gmail.com>
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -67,7 +67,7 @@ Quote::Quote(QGraphicsWidget *parent) :
     // size when mouse leaves the widget with hoverLeaveEvent
     frame.setTopLeft(QPoint(0, 0));
     frame.setSize(contentsRect().size().toSize());
-    frame.adjust(10, 5, -10, -5);
+    frame.adjust(10, 5, 20, 10);
 
     connect(m_ext_icon, SIGNAL(clicked()), this, SLOT(iconClicked()));
 
@@ -77,11 +77,6 @@ Quote::Quote(QGraphicsWidget *parent) :
     // icon is apparently square only
     m_ext_icon->resize(m_ext_icon->sizeFromIconSize(20));
     m_ext_icon->hide();
-
-    qreal width = geometry().width();
-    qreal height = geometry().height();
-    // show external link icon
-    m_ext_icon->setPos(width - m_ext_icon->geometry().width(), (height - m_ext_icon->geometry().height())/2);
 }
 
 Quote::~Quote()
@@ -97,7 +92,7 @@ void Quote::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
 
     m_item_background->setImagePath("quotesee/itemBackground");
 
-    m_item_background->resize(contentsRect().width(), contentsRect().height());
+    m_item_background->resize(geometry().width(), geometry().height());
     m_item_background->paint(painter,0, 0);
 
     QFont font(painter->font());
@@ -105,9 +100,17 @@ void Quote::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
     font.setBold(true);
     painter->setFont(font);
 
-    painter->drawText(frame, Qt::AlignLeft  | Qt::AlignTop, code.toUpper());
+    frame.setSize(contentsRect().size().toSize());
 
-    painter->drawText(frame, Qt::AlignLeft  | Qt::AlignBottom, name);
+    QRectF r = QRectF(0, 0, geometry().width() - 20, geometry().height());
+    painter->drawText(r, Qt::AlignLeft  | Qt::AlignTop, code.toUpper());
+
+    painter->drawText(r, Qt::AlignLeft  | Qt::AlignBottom, name);
+
+    qreal width = geometry().width();
+    qreal height = geometry().height();
+    // show external link icon
+    m_ext_icon->setPos(width - m_ext_icon->geometry().width() - 20, (height - m_ext_icon->geometry().height())/2);
 
     QString schange;
     QTextStream stream(&schange);
@@ -115,7 +118,7 @@ void Quote::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
     switch(status)
     {
         case SUCCESS : {
-                            painter->drawText(frame, Qt::AlignRight | Qt::AlignTop, lastTrade);
+                            painter->drawText(r, Qt::AlignRight | Qt::AlignTop, lastTrade);
 
                             font.setBold(false);
                             painter->setFont(font);
@@ -134,7 +137,7 @@ void Quote::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
                                 stream << " (" <<  pchange << "%)";
                             }
                             painter->setPen(change.toDouble() < 0 ? Qt::red : Qt::green);
-                            painter->drawText(frame, Qt::AlignRight | Qt::AlignBottom, schange);
+                            painter->drawText(r, Qt::AlignRight | Qt::AlignBottom, schange);
                             break;
                         }
         case ERROR :    {
